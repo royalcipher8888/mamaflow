@@ -192,6 +192,37 @@ body::after {
 .week-header p{font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:12px;text-transform:uppercase;}
 .astro-band{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.12);border-left:2px solid rgba(201,168,76,.3);border-radius:1px;padding:14px 20px;margin-bottom:24px;font-size:11px;color:rgba(201,168,76,.55);line-height:1.85;font-style:italic;animation:fadeDown .8s .05s ease both;}
 .astro-band strong{color:var(--gold);font-style:normal;}
+.astro-callout{border:1px solid rgba(106,74,160,.22);border-left:3px solid var(--purple-light);border-radius:1px;padding:16px 20px;margin-bottom:20px;animation:fadeDown .8s .05s ease both;}
+.astro-callout-inner{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.astro-moon-badge{flex-shrink:0;}
+.astro-moon-sign{font-family:'Playfair Display',serif;font-size:22px;color:var(--purple-light);line-height:1;}
+.astro-moon-label{font-size:7px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.astro-callout-body{flex:1;min-width:180px;}
+.astro-energy-line{font-size:11px;color:rgba(184,160,224,.75);line-height:1.7;margin-bottom:8px;font-style:italic;}
+.astro-energy-line strong{color:var(--purple-light);font-style:normal;}
+.astro-day-suggest{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.astro-suggest-label{font-size:8px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+.astro-day-pills{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;}
+.astro-pill{font-size:8px;letter-spacing:.1em;padding:4px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:all .2s;font-family:'DM Mono',monospace;text-transform:uppercase;}
+.astro-pill.push-p{background:rgba(201,168,76,.1);color:var(--gold-dim);border-color:rgba(201,168,76,.2);}
+.astro-pill.create-p{background:rgba(74,122,48,.1);color:var(--green-light);border-color:rgba(74,122,48,.2);}
+.astro-pill.skill-p{background:rgba(106,74,160,.12);color:var(--purple-light);border-color:rgba(106,74,160,.2);}
+.astro-pill.rest-p{background:rgba(74,94,79,.1);color:#7aab85;border-color:rgba(74,94,79,.2);}
+.astro-pill.active-day{box-shadow:0 0 0 1.5px currentColor;filter:brightness(1.25);}
+.retro-flag{margin-top:8px;font-size:9px;color:rgba(212,128,154,.85);display:none;font-style:normal;}
+.retro-flag.show{display:block;}
+.astro-fire{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border-color:rgba(201,168,76,.22);border-left-color:var(--gold);}
+.astro-fire .astro-moon-sign,.astro-fire .astro-energy-line strong{color:var(--gold);}
+.astro-fire .astro-energy-line{color:rgba(201,168,76,.75);}
+.astro-earth{background:linear-gradient(135deg,rgba(42,138,118,.1),rgba(42,138,118,.04));border-color:rgba(42,138,118,.22);border-left-color:var(--teal-light);}
+.astro-earth .astro-moon-sign,.astro-earth .astro-energy-line strong{color:var(--teal-light);}
+.astro-earth .astro-energy-line{color:rgba(114,196,178,.75);}
+.astro-air{background:linear-gradient(135deg,rgba(42,90,138,.1),rgba(42,90,138,.04));border-color:rgba(42,90,138,.22);border-left-color:var(--sky-light);}
+.astro-air .astro-moon-sign,.astro-air .astro-energy-line strong{color:var(--sky-light);}
+.astro-air .astro-energy-line{color:rgba(112,168,216,.75);}
+.astro-water{background:linear-gradient(135deg,rgba(106,74,160,.1),rgba(106,74,160,.04));border-color:rgba(106,74,160,.22);border-left-color:var(--purple-light);}
+.astro-water .astro-moon-sign,.astro-water .astro-energy-line strong{color:var(--purple-light);}
+.astro-water .astro-energy-line{color:rgba(184,160,224,.75);}
 .session-prefs{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:18px 20px;margin-bottom:22px;animation:fadeDown .8s .08s ease both;}
 .session-prefs-title{font-size:9px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
 .scount-badge{font-size:8px;letter-spacing:.1em;padding:2px 9px;border-radius:10px;background:rgba(154,122,48,.12);color:var(--amber-light);border:1px solid rgba(154,122,48,.2);}
@@ -468,7 +499,22 @@ body::after {
   <div class="legend-item"><div class="legend-dot" style="background:var(--purple);color:var(--purple)"></div>Skill building</div>
   <div class="legend-item"><div class="legend-dot" style="background:#4A7A50;color:#4A7A50"></div>Restore</div>
 </div>
-<div id="daily-astro-box" class="astro-band" style="display:none"></div>
+<div id="daily-astro-box" class="astro-callout" style="display:none">
+  <div class="astro-callout-inner">
+    <div class="astro-moon-badge">
+      <div class="astro-moon-sign" id="astro-moon-sign">—</div>
+      <div class="astro-moon-label">Moon Phase Today</div>
+    </div>
+    <div class="astro-callout-body">
+      <div class="astro-energy-line" id="astro-energy-line"></div>
+      <div class="astro-day-suggest">
+        <span class="astro-suggest-label">Best day type →</span>
+        <div class="astro-day-pills" id="astro-day-pills"></div>
+      </div>
+      <div class="retro-flag" id="retro-flag">☿ Mercury Retrograde — proof, don't pitch. Confirm, don't launch.</div>
+    </div>
+  </div>
+</div>
 <div class="day-toggle">
   <button class="day-btn active" onclick="setDay('push',this)">🔥 Push Day</button>
   <button class="day-btn" onclick="setDay('create',this)">✨ Create Day</button>
@@ -900,15 +946,42 @@ function renderAstroBox(){
   else if(dow===6){elementKey='earth';elementColor='var(--teal)';}
   else{elementKey='water';elementColor='var(--rose)';}
   var retro=false;
-  var rw=[[new Date(2026,0,25),new Date(2026,1,15)],[new Date(2026,4,29),new Date(2026,5,22)],[new Date(2026,8,22),new Date(2026,9,13)]];
+  var rw=[[new Date(2026,2,15),new Date(2026,3,7)],[new Date(2026,6,10),new Date(2026,7,2)],[new Date(2026,9,31),new Date(2026,10,20)]];
   rw.forEach(function(w){if(today>=w[0]&&today<=w[1])retro=true;});
   var ac={'new':{fire:"New moon, fire day. Set the intention out loud — Sag Moon needs to hear it to believe it.",air:"New moon, air day. Libra Rising loves a fresh start with a plan. Write it down.",earth:"New moon, earth day. Ground the vision in one concrete action today.",water:"New moon, water day. Rest before the push. Let the reset be real."},'waxing-crescent':{fire:"Sag Moon has traction. Leo Sun wants to be seen. Push.",air:"Waxing energy + air day. Outreach, visibility, conversation. Show up.",earth:"Momentum is building. Plant something that will compound.",water:"Tender energy. Create quietly. Don't force the launch."},'first-quarter':{fire:"Decision day. Leo Sun doesn't hesitate when the fire is right. Act.",air:"Libra Rising wants to weigh everything — pick one thing and move.",earth:"Quarter moon: what's working? Double down on it.",water:"Check in with your body. The right decision will feel settled."},'waxing-gibbous':{fire:"Almost full. Refine, don't restart. Leo energy is building to a peak.",air:"Finishing energy. Tie the threads. Visibility is about to peak.",earth:"Polish and prepare. The delivery is coming.",water:"Trust what you've built. The reveal is close."},'full':{fire:"Full Moon + fire day — visibility, boldness, receipts. Go loud today.",air:"Full Moon, air day. Say the thing publicly. Post, pitch, be seen.",earth:"Full Moon harvest. What has actually grown? Celebrate it.",water:"Full Moon water day. Feel everything. Then channel it into something real."},'waning-gibbous':{fire:"Gratitude phase. What worked this cycle? Leo Sun needs to acknowledge wins.",air:"Teach what you learned. Sag Moon integrates through sharing.",earth:"Consolidate. Organize. Systemize what's working.",water:"Release what didn't serve. Gentle, intentional editing."},'last-quarter':{fire:"Break what isn't working. Sag Moon clears with confidence.",air:"Last quarter air. Have the conversation you've been avoiding.",earth:"Audit and cut. Clean systems create space for new revenue.",water:"Forgive yourself for the cycle's missteps. Softly reset."},'waning-crescent':{fire:"Almost new. Rest the fire. Even Leo needs to let the coals breathe.",air:"Waning crescent. Reflect quietly. Libra Rising integrates in stillness.",earth:"Prepare the soil. Do the invisible work.",water:"Full rest mode. This is not laziness — it's the cycle completing."}};
   var copy=(ac[phaseKey]&&ac[phaseKey][elementKey])||'';
-  var html='';
-  if(retro)html+='<div style="color:var(--amber);font-style:normal;font-weight:600;margin-bottom:8px;">&#9888;&#65039; Mercury Retrograde — proof, don\'t pitch. Confirm, don\'t launch.</div>';
-  html+='<strong style="color:var(--gold);font-style:normal;">'+phaseEmoji+' '+phaseName+'</strong> &nbsp;&middot;&nbsp; <span style="color:'+elementColor+';font-style:normal;">'+elementKey+' day</span><br>'+copy;
+  // Recommended day type by element
+  var elementDayMap={fire:'push',air:'create',earth:'skill',water:'rest'};
+  var recommendedDay=elementDayMap[elementKey]||'push';
   var el=document.getElementById('daily-astro-box');
-  if(el){el.innerHTML=html;el.style.display='';}
+  if(!el)return;
+  // Populate child elements
+  document.getElementById('astro-moon-sign').textContent=phaseEmoji+' '+phaseName;
+  document.getElementById('astro-energy-line').innerHTML='<strong>'+elementKey+' day</strong> — '+copy;
+  // Build day pills
+  var pillMap={push:'push-p',create:'create-p',skill:'skill-p',rest:'rest-p'};
+  var pillEmoji={push:'🔥',create:'✨',skill:'🛡',rest:'🌿'};
+  var pillLabel={push:'Push Day',create:'Create Day',skill:'Skill Day',rest:'Rest Day'};
+  document.getElementById('astro-day-pills').innerHTML=['push','create','skill','rest'].map(function(t){
+    var active=(t===recommendedDay)?' active-day':'';
+    return '<div class="astro-pill '+pillMap[t]+active+'" onclick="setDayFromAstro(\''+t+'\')">'+pillEmoji[t]+' '+pillLabel[t]+'</div>';
+  }).join('');
+  // Retrograde
+  var flag=document.getElementById('retro-flag');
+  if(flag){if(retro)flag.classList.add('show');else flag.classList.remove('show');}
+  // Element theming on the box
+  el.className='astro-callout astro-'+elementKey;
+  el.style.display='';
+}
+function setDayFromAstro(type){
+  currentDay=type;
+  var dayMap={push:0,create:1,skill:2,rest:3};
+  var btns=document.querySelectorAll('.day-btn');
+  btns.forEach(function(b){b.classList.remove('active','skill-active');});
+  if(dayMap[type]!==undefined&&btns[dayMap[type]]){btns[dayMap[type]].classList.add('active');if(type==='skill')btns[dayMap[type]].classList.add('skill-active');}
+  document.querySelectorAll('.astro-pill').forEach(function(p){p.classList.remove('active-day');});
+  document.querySelectorAll('#astro-day-pills .astro-pill').forEach(function(p){if(p.getAttribute('onclick')&&p.getAttribute('onclick').indexOf("'"+type+"'")!==-1)p.classList.add('active-day');});
+  renderBlocks();try{saveState();showSaved();}catch(e){}
 }
 try{loadState();}catch(e){}
 renderBlocks();
