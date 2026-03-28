@@ -467,6 +467,7 @@ body::after {
   <div class="legend-item"><div class="legend-dot" style="background:var(--purple);color:var(--purple)"></div>Skill building</div>
   <div class="legend-item"><div class="legend-dot" style="background:#4A7A50;color:#4A7A50"></div>Restore</div>
 </div>
+<div id="daily-astro-box" class="astro-band" style="display:none"></div>
 <div class="day-toggle">
   <button class="day-btn active" onclick="setDay('push',this)">🔥 Push Day</button>
   <button class="day-btn" onclick="setDay('create',this)">✨ Create Day</button>
@@ -877,6 +878,37 @@ var suffixMap={vip:'bookings',dig:'sales',coaching:'clients',hub:'members',acuit
 var listEl=document.getElementById('log-list');var entries=incomeData[key]||[];if(entries.length===0){listEl.innerHTML='<div class="log-empty">No payments logged yet this month.<br>Every booking starts here. \ud83e\udd81</div>';}else{listEl.innerHTML=entries.map(function(e){return '<div class="log-entry"><div class="log-entry-dot '+e.stream+'"></div><div class="log-entry-info"><div class="log-entry-desc">'+e.desc+'</div><div class="log-entry-date">'+e.date+' \u00b7 '+(streamLabels[e.stream]||e.stream)+'</div></div><div class="log-entry-amount">'+fmtMoney(e.amount)+'</div><button class="log-entry-del" onclick="deleteEntry(\''+key+'\','+e.id+')" title="Delete">\u00d7</button></div>';}).join('');}renderHistory();}
 function renderHistory(){var currentKey=getMonthKey(viewingMonth);var keys=Object.keys(incomeData).filter(function(k){return k!==currentKey;}).sort(function(a,b){return b.localeCompare(a);});var histEl=document.getElementById('history-list');if(keys.length===0){histEl.innerHTML='<div class="log-empty" style="padding:16px;">No past months recorded yet.</div>';return;}histEl.innerHTML=keys.map(function(k){var parts=k.split('-');var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,1);var monthTotal=getMonthTotal(k);var pct=Math.min(100,Math.round((monthTotal/GOAL)*100));return '<div class="history-month"><div class="history-month-label">'+getMonthLabel(d)+'</div><div class="history-month-pct">'+pct+'%</div><div class="history-month-total">'+fmtMoney(monthTotal)+'</div></div><div class="history-month-bar"><div class="history-month-fill" style="width:'+pct+'%"></div></div>';}).join('');}
 function toggleHistory(){var toggle=document.getElementById('history-toggle');var body=document.getElementById('history-body');toggle.classList.toggle('open');body.classList.toggle('open');}
+function renderAstroBox(){
+  var today=new Date();
+  var anchor=new Date(2000,0,6);
+  var daysSince=(today-anchor)/86400000;
+  var pos=((daysSince%29.53059)+29.53059)%29.53059;
+  var phaseKey,phaseEmoji,phaseName;
+  if(pos<1.85){phaseKey='new';phaseEmoji='🌑';phaseName='New Moon';}
+  else if(pos<7.38){phaseKey='waxing-crescent';phaseEmoji='🌒';phaseName='Waxing Crescent';}
+  else if(pos<11.08){phaseKey='first-quarter';phaseEmoji='🌓';phaseName='First Quarter';}
+  else if(pos<14.77){phaseKey='waxing-gibbous';phaseEmoji='🌔';phaseName='Waxing Gibbous';}
+  else if(pos<16.61){phaseKey='full';phaseEmoji='🌕';phaseName='Full Moon';}
+  else if(pos<22.15){phaseKey='waning-gibbous';phaseEmoji='🌖';phaseName='Waning Gibbous';}
+  else if(pos<25.84){phaseKey='last-quarter';phaseEmoji='🌗';phaseName='Last Quarter';}
+  else{phaseKey='waning-crescent';phaseEmoji='🌘';phaseName='Waning Crescent';}
+  var dow=today.getDay();
+  var elementKey,elementColor;
+  if(dow===1||dow===3||dow===5){elementKey='air';elementColor='#7ecce0';}
+  else if(dow===2||dow===4){elementKey='fire';elementColor='var(--gold)';}
+  else if(dow===6){elementKey='earth';elementColor='var(--teal)';}
+  else{elementKey='water';elementColor='var(--rose)';}
+  var retro=false;
+  var rw=[[new Date(2026,0,25),new Date(2026,1,15)],[new Date(2026,4,29),new Date(2026,5,22)],[new Date(2026,8,22),new Date(2026,9,13)]];
+  rw.forEach(function(w){if(today>=w[0]&&today<=w[1])retro=true;});
+  var ac={'new':{fire:"New moon, fire day. Set the intention out loud — Sag Moon needs to hear it to believe it.",air:"New moon, air day. Libra Rising loves a fresh start with a plan. Write it down.",earth:"New moon, earth day. Ground the vision in one concrete action today.",water:"New moon, water day. Rest before the push. Let the reset be real."},'waxing-crescent':{fire:"Sag Moon has traction. Leo Sun wants to be seen. Push.",air:"Waxing energy + air day. Outreach, visibility, conversation. Show up.",earth:"Momentum is building. Plant something that will compound.",water:"Tender energy. Create quietly. Don't force the launch."},'first-quarter':{fire:"Decision day. Leo Sun doesn't hesitate when the fire is right. Act.",air:"Libra Rising wants to weigh everything — pick one thing and move.",earth:"Quarter moon: what's working? Double down on it.",water:"Check in with your body. The right decision will feel settled."},'waxing-gibbous':{fire:"Almost full. Refine, don't restart. Leo energy is building to a peak.",air:"Finishing energy. Tie the threads. Visibility is about to peak.",earth:"Polish and prepare. The delivery is coming.",water:"Trust what you've built. The reveal is close."},'full':{fire:"Full Moon + fire day — visibility, boldness, receipts. Go loud today.",air:"Full Moon, air day. Say the thing publicly. Post, pitch, be seen.",earth:"Full Moon harvest. What has actually grown? Celebrate it.",water:"Full Moon water day. Feel everything. Then channel it into something real."},'waning-gibbous':{fire:"Gratitude phase. What worked this cycle? Leo Sun needs to acknowledge wins.",air:"Teach what you learned. Sag Moon integrates through sharing.",earth:"Consolidate. Organize. Systemize what's working.",water:"Release what didn't serve. Gentle, intentional editing."},'last-quarter':{fire:"Break what isn't working. Sag Moon clears with confidence.",air:"Last quarter air. Have the conversation you've been avoiding.",earth:"Audit and cut. Clean systems create space for new revenue.",water:"Forgive yourself for the cycle's missteps. Softly reset."},'waning-crescent':{fire:"Almost new. Rest the fire. Even Leo needs to let the coals breathe.",air:"Waning crescent. Reflect quietly. Libra Rising integrates in stillness.",earth:"Prepare the soil. Do the invisible work.",water:"Full rest mode. This is not laziness — it's the cycle completing."}};
+  var copy=(ac[phaseKey]&&ac[phaseKey][elementKey])||'';
+  var html='';
+  if(retro)html+='<div style="color:var(--amber);font-style:normal;font-weight:600;margin-bottom:8px;">&#9888;&#65039; Mercury Retrograde — proof, don\'t pitch. Confirm, don\'t launch.</div>';
+  html+='<strong style="color:var(--gold);font-style:normal;">'+phaseEmoji+' '+phaseName+'</strong> &nbsp;&middot;&nbsp; <span style="color:'+elementColor+';font-style:normal;">'+elementKey+' day</span><br>'+copy;
+  var el=document.getElementById('daily-astro-box');
+  if(el){el.innerHTML=html;el.style.display='';}
+}
 try{loadState();}catch(e){}
 renderBlocks();
 // Harden day button sync after renderBlocks runs
@@ -891,6 +923,7 @@ renderBlocks();
   }
 })();
 try{restoreRecallUI();}catch(e){}
+try{renderAstroBox();}catch(e){}
 function showSaved(){var el=document.getElementById('save-indicator');if(!el)return;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';},1200);}
 loadIncome();
 </script>
