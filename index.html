@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenyatta · Daily Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Cinzel:wght@400;500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C; --gold-dim:#8a6f2e; --gold-pale:rgba(201,168,76,0.08);
+  --gold-glow:rgba(201,168,76,0.15);
+  --cream:#F5EFE0; --ink:#0E0B07; --ink2:#181410;
+  --rose:#9B4060; --rose-light:#d4809a; --rose-glow:rgba(155,64,96,0.12);
+  --teal:#2A8A76; --teal-light:#72c4b2; --teal-glow:rgba(42,138,118,0.1);
+  --amber:#9A7A30; --amber-light:#d4b060; --amber-glow:rgba(154,122,48,0.12);
+  --purple:#6A4AA0; --purple-light:#b8a0e0; --purple-glow:rgba(106,74,160,0.12);
+  --green:#4A7A30; --green-light:#90c060;
+  --muted:#6a5e52; --muted2:#8a7e72;
+  --sky:#2A5A8A; --sky-light:#70a8d8;
+  --rust:#7A3A22;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--ink); color:var(--cream);
+  font-family:'DM Mono',monospace; min-height:100vh;
+  overflow-x:hidden; cursor:default;
+}
+body::before {
+  content:''; position:fixed; inset:0; z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(201,168,76,0.03) 0%,transparent 70%);
+  pointer-events:none;
+}
+body::after {
+  content:''; position:fixed; inset:0; z-index:0; opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.container { max-width:940px; margin:0 auto; padding:52px 22px 100px; position:relative; z-index:1; }
+.nav-tabs {
+  display:flex; gap:1px; background:rgba(201,168,76,0.08);
+  border:1px solid rgba(201,168,76,0.15); border-radius:1px; padding:2px;
+  margin:0 auto 52px; max-width:380px; animation:fadeDown 0.8s ease both;
+}
+.nav-tab {
+  flex:1; background:none; border:none; color:var(--muted);
+  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.18em;
+  text-transform:uppercase; padding:11px 6px; cursor:pointer; border-radius:1px; transition:all .3s;
+}
+.nav-tab:hover { color:var(--cream); }
+.nav-tab.active {
+  background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.08));
+  color:var(--gold); letter-spacing:.2em;
+}
+.view { display:none; }
+.view.active { display:block; }
+.header { text-align:center; margin-bottom:44px; animation:fadeDown 0.9s 0.05s ease both; }
+.header-eyebrow {
+  font-size:9px; letter-spacing:.4em; color:var(--gold-dim); text-transform:uppercase;
+  margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:12px;
+}
+.header-eyebrow::before,.header-eyebrow::after {
+  content:''; flex:1; max-width:60px; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3));
+}
+.header-eyebrow::after { background:linear-gradient(90deg,rgba(201,168,76,0.3),transparent); }
+.header h1 {
+  font-family:'Playfair Display',serif; font-size:clamp(48px,9vw,88px);
+  font-weight:400; line-height:.95; letter-spacing:-.02em; color:var(--cream);
+}
+.header h1 em { font-style:italic; color:var(--gold); font-weight:400; }
+.header-rule { width:48px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:20px auto 16px; }
+.header-sub { font-size:10px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; }
+.legend {
+  display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+  margin:0 0 32px; animation:fadeDown 0.8s 0.1s ease both;
+}
+.legend-item { display:flex; align-items:center; gap:7px; font-size:8px; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; }
+.legend-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px currentColor; }
+.day-toggle {
+  display:flex; gap:3px; margin:0 auto 28px; max-width:600px;
+  background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.06);
+  border-radius:1px; padding:3px; animation:fadeDown 0.8s 0.15s ease both;
+}
+.day-btn {
+  flex:1; background:none; border:none; color:var(--muted2);
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em;
+  text-transform:uppercase; padding:10px 4px; cursor:pointer; border-radius:1px;
+  transition:all .25s; white-space:nowrap;
+}
+.day-btn:hover { color:var(--cream); background:rgba(255,255,255,0.03); }
+.day-btn.active { background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08)); color:var(--gold); border:1px solid rgba(201,168,76,0.2); }
+.day-btn.active.skill-active { background:linear-gradient(135deg,rgba(106,74,160,0.25),rgba(106,74,160,0.1)); color:var(--purple-light); border:1px solid rgba(106,74,160,0.25); }
+.family-bar {
+  border-radius:1px; padding:14px 20px; margin-bottom:20px;
+  font-size:11px; line-height:1.8; color:#c09090;
+  background:linear-gradient(135deg,rgba(155,64,96,0.08),rgba(155,64,96,0.03));
+  border:1px solid rgba(155,64,96,0.2); border-left:3px solid var(--rose);
+  animation:fadeDown 0.8s 0.2s ease both;
+}
+.family-bar strong { color:var(--rose-light); }
+.family-bar.skill-bar { background:linear-gradient(135deg,rgba(106,74,160,0.1),rgba(106,74,160,0.03)); border-color:rgba(106,74,160,0.22); border-left-color:var(--purple-light); color:#b0a0d0; }
+.family-bar.skill-bar strong { color:var(--purple-light); }
+.progress-wrap { margin-bottom:20px; animation:fadeDown 0.8s 0.22s ease both; }
+.progress-label { display:flex; justify-content:space-between; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.progress-track { height:1px; background:rgba(255,255,255,0.07); position:relative; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold),#f0d080); transition:width .6s cubic-bezier(.4,0,.2,1); position:relative; }
+.progress-fill::after { content:''; position:absolute; right:0; top:-2px; width:4px; height:4px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px var(--gold); }
+.blocks { display:flex; flex-direction:column; gap:2px; }
+.theme-block { border-radius:1px; overflow:hidden; animation:slideUp 0.5s ease both; transition:transform .2s; }
+.theme-block:nth-child(1){animation-delay:.04s}.theme-block:nth-child(2){animation-delay:.08s}
+.theme-block:nth-child(3){animation-delay:.12s}.theme-block:nth-child(4){animation-delay:.16s}
+.theme-block:nth-child(5){animation-delay:.20s}.theme-block:nth-child(6){animation-delay:.24s}
+.theme-block:nth-child(7){animation-delay:.28s}
+.block-header {
+  display:flex; align-items:center; gap:16px; padding:16px 22px;
+  cursor:pointer; border-left:2px solid transparent; transition:all .25s;
+  user-select:none; position:relative;
+}
+.block-header::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(255,255,255,0.025),transparent); opacity:0; transition:opacity .25s; pointer-events:none; }
+.block-header:hover::after { opacity:1; }
+.bceo .block-header{background:#111009;border-left-color:var(--gold);}
+.bvis .block-header{background:#0d0f11;border-left-color:var(--sky-light);}
+.bclose .block-header{background:#110e0d;border-left-color:#c07060;}
+.bquiet .block-header{background:#110e10;border-left-color:var(--rose-light);}
+.bkids .block-header{background:#0d1110;border-left-color:var(--teal-light);}
+.bnight .block-header{background:#11100d;border-left-color:var(--amber-light);}
+.bskill .block-header{background:#0e0d11;border-left-color:var(--purple-light);}
+.brestore .block-header{background:#0d110e;border-left-color:#7aab85;}
+.bcreate .block-header{background:#0d100c;border-left-color:var(--green-light);}
+.bspouse .block-header{background:#0f0e12;border-left-color:#a898cc;}
+.bceo .block-inner,.bvis .block-inner,.bclose .block-inner,.bquiet .block-inner,
+.bkids .block-inner,.bnight .block-inner,.bskill .block-inner,.brestore .block-inner,
+.bcreate .block-inner,.bspouse .block-inner{background:#0c0a08;}
+.theme-block.open{box-shadow:0 2px 24px rgba(0,0,0,0.4);}
+.theme-block.open.bceo{box-shadow:0 2px 24px rgba(201,168,76,0.04);}
+.theme-block.open.bskill{box-shadow:0 2px 24px rgba(106,74,160,0.05);}
+.theme-block.open.bkids{box-shadow:0 2px 24px rgba(42,138,118,0.04);}
+.theme-block.open.bnight{box-shadow:0 2px 24px rgba(154,122,48,0.04);}
+.block-time{font-size:9px;letter-spacing:.08em;color:var(--muted);min-width:120px;line-height:1.7;}
+.win-tag{display:inline-block;font-size:7px;letter-spacing:.15em;padding:2px 7px;border-radius:10px;margin-top:4px;text-transform:uppercase;font-weight:500;}
+.win-biz{background:rgba(201,168,76,.1);color:var(--gold-dim);border:1px solid rgba(201,168,76,.15);}
+.win-baby{background:rgba(155,64,96,.1);color:var(--rose-light);border:1px solid rgba(155,64,96,.18);}
+.win-kids{background:rgba(42,138,118,.1);color:var(--teal-light);border:1px solid rgba(42,138,118,.18);}
+.win-night{background:rgba(154,122,48,.1);color:var(--amber-light);border:1px solid rgba(154,122,48,.18);}
+.win-skill{background:rgba(106,74,160,.12);color:var(--purple-light);border:1px solid rgba(106,74,160,.2);}
+.win-solo{background:rgba(74,94,79,.1);color:#7aab85;border:1px solid rgba(74,94,79,.18);}
+.win-soft{background:rgba(255,255,255,.04);color:var(--muted2);border:1px solid rgba(255,255,255,.07);}
+.win-spouse{background:rgba(128,106,154,.1);color:#c0a8e0;border:1px solid rgba(128,106,154,.18);}
+.win-create{background:rgba(74,122,48,.1);color:var(--green-light);border:1px solid rgba(74,122,48,.18);}
+.block-label{flex:1;}
+.theme-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:400;color:var(--cream);line-height:1.1;letter-spacing:-.01em;}
+.theme-tag{font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:5px;}
+.block-caret{width:22px;height:22px;border:1px solid rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);transition:all .3s;flex-shrink:0;}
+.theme-block.open .block-caret{transform:rotate(180deg);border-color:rgba(201,168,76,0.2);color:var(--gold-dim);}
+.block-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+.theme-block.open .block-body{max-height:1200px;}
+.block-inner{padding:0 22px 22px;}
+.block-divider{height:1px;margin:0 0 16px;background:linear-gradient(90deg,rgba(255,255,255,0.06),transparent);}
+.task-list{display:flex;flex-direction:column;gap:2px;}
+.task{display:flex;align-items:flex-start;gap:14px;padding:11px 13px;border-radius:1px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all .2s;border:1px solid transparent;}
+.task:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.04);}
+.task.done{opacity:.32;}
+.task-check{width:15px;height:15px;border:1px solid rgba(255,255,255,0.12);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gold);transition:all .2s;}
+.task.done .task-check{background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.3);box-shadow:0 0 6px rgba(201,168,76,0.15);}
+.task-text{font-size:11.5px;line-height:1.7;color:rgba(245,239,224,0.85);flex:1;}
+.task.done .task-text{text-decoration:line-through;color:var(--muted);}
+.task-tag{font-size:7px;letter-spacing:.12em;padding:2px 8px;border-radius:10px;flex-shrink:0;margin-top:3px;text-transform:uppercase;border:1px solid transparent;}
+.tag-vip{background:rgba(201,168,76,.08);color:var(--gold-dim);border-color:rgba(201,168,76,.15);}
+.tag-vis{background:rgba(42,90,138,.12);color:#80b8e8;border-color:rgba(42,90,138,.2);}
+.tag-cyber{background:rgba(122,58,34,.12);color:#d09080;border-color:rgba(122,58,34,.2);}
+.tag-ceo{background:rgba(255,255,255,.04);color:var(--muted2);border-color:rgba(255,255,255,.07);}
+.tag-soul{background:rgba(74,122,79,.1);color:#90c898;border-color:rgba(74,122,79,.18);}
+.tag-mama{background:rgba(155,64,96,.1);color:var(--rose-light);border-color:rgba(155,64,96,.18);}
+.tag-night{background:rgba(154,122,48,.1);color:var(--amber-light);border-color:rgba(154,122,48,.18);}
+.tag-skill{background:rgba(106,74,160,.12);color:var(--purple-light);border-color:rgba(106,74,160,.2);}
+.note-block{margin-top:10px;padding:11px 15px;border-radius:1px;font-size:10.5px;line-height:1.8;font-style:italic;}
+.note-astro{border-left:1px solid rgba(201,168,76,0.25);color:rgba(201,168,76,0.55);background:rgba(201,168,76,0.03);}
+.note-astro::before{content:'♌ ';font-style:normal;opacity:0.7;}
+.note-fam{border-left:1px solid rgba(42,138,118,0.3);color:rgba(114,196,178,0.65);background:rgba(42,138,118,0.03);font-style:normal;}
+.note-fam strong{color:rgba(114,196,178,0.9);}
+.note-skill{border-left:1px solid rgba(106,74,160,0.3);color:rgba(184,160,224,0.65);background:rgba(106,74,160,0.04);font-style:normal;}
+.note-skill strong{color:var(--purple-light);}
+.mantra{margin-top:52px;text-align:center;animation:fadeUp 0.9s 0.4s ease both;}
+.mantra-rule{width:1px;height:36px;background:linear-gradient(180deg,transparent,rgba(201,168,76,0.3),transparent);margin:0 auto 18px;}
+.mantra p{font-family:'Playfair Display',serif;font-size:clamp(15px,2.4vw,20px);font-weight:400;font-style:italic;color:rgba(201,168,76,0.3);letter-spacing:.01em;line-height:1.75;}
+.reset-btn{display:block;margin:18px auto 0;background:none;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.25em;text-transform:uppercase;padding:9px 22px;cursor:pointer;border-radius:1px;transition:all .25s;}
+.reset-btn:hover{border-color:rgba(201,168,76,0.2);color:var(--gold-dim);}
+.week-header{text-align:center;margin-bottom:32px;animation:fadeDown .8s ease both;}
+.week-header h2{font-family:'Playfair Display',serif;font-size:clamp(34px,6vw,58px);font-weight:400;color:var(--cream);line-height:1;}
+.week-header h2 em{font-style:italic;color:var(--gold);}
+.week-header p{font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:12px;text-transform:uppercase;}
+.astro-band{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.12);border-left:2px solid rgba(201,168,76,.3);border-radius:1px;padding:14px 20px;margin-bottom:24px;font-size:11px;color:rgba(201,168,76,.55);line-height:1.85;font-style:italic;animation:fadeDown .8s .05s ease both;}
+.astro-band strong{color:var(--gold);font-style:normal;}
+.session-prefs{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:18px 20px;margin-bottom:22px;animation:fadeDown .8s .08s ease both;}
+.session-prefs-title{font-size:9px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.scount-badge{font-size:8px;letter-spacing:.1em;padding:2px 9px;border-radius:10px;background:rgba(154,122,48,.12);color:var(--amber-light);border:1px solid rgba(154,122,48,.2);}
+.session-rows{display:flex;flex-direction:column;gap:10px;}
+.session-row{display:flex;align-items:center;gap:14px;}
+.session-row-info{flex:1;}
+.session-row-label{font-size:11.5px;color:var(--cream);}
+.session-row-sub{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.04em;}
+.toggle-wrap{position:relative;width:38px;height:21px;flex-shrink:0;}
+.toggle-wrap input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-radius:21px;cursor:pointer;transition:.3s;}
+.toggle-slider:before{content:'';position:absolute;width:15px;height:15px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.3s;}
+.toggle-wrap input:checked+.toggle-slider{background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.3);}
+.toggle-wrap input:checked+.toggle-slider:before{transform:translateX(17px);background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,0.4);}
+.rhythm-templates{margin-bottom:20px;animation:fadeDown .8s .1s ease both;}
+.rhythm-title{font-size:9px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.template-row{display:flex;gap:5px;flex-wrap:wrap;}
+.template-btn{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:1px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted2);cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.template-btn:hover{border-color:rgba(201,168,76,.25);color:var(--gold-dim);background:var(--gold-pale);}
+.day-type-legend{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;animation:fadeDown .8s .12s ease both;}
+.dtype-pill{font-size:9px;letter-spacing:.1em;padding:7px 16px;border-radius:20px;cursor:pointer;border:1px solid transparent;transition:all .2s;font-family:'DM Mono',monospace;text-transform:uppercase;}
+.dtype-pill.push-pill{background:rgba(201,168,76,.08);color:var(--gold-dim);border-color:rgba(201,168,76,.15);}
+.dtype-pill.create-pill{background:rgba(74,122,48,.09);color:var(--green-light);border-color:rgba(74,122,48,.18);}
+.dtype-pill.skill-pill{background:rgba(106,74,160,.1);color:var(--purple-light);border-color:rgba(106,74,160,.18);}
+.dtype-pill.rest-pill{background:rgba(74,94,79,.1);color:#7aab85;border-color:rgba(74,94,79,.2);}
+.dtype-pill.selected{box-shadow:0 0 0 1.5px currentColor;filter:brightness(1.2);}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:22px;animation:fadeDown .8s .14s ease both;}
+.day-cell{border-radius:1px;overflow:hidden;cursor:pointer;transition:all .22s;border:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;min-height:130px;}
+.day-cell:hover{border-color:rgba(255,255,255,.14);transform:translateY(-1px);}
+.day-cell.is-today{border-color:rgba(201,168,76,.28);box-shadow:0 0 16px rgba(201,168,76,.06);}
+.day-cell-header{padding:8px 8px 5px;border-bottom:1px solid rgba(255,255,255,.04);}
+.day-name{font-family:'Playfair Display',serif;font-size:12px;color:var(--cream);font-weight:400;}
+.day-date{font-size:8px;color:var(--muted);margin-top:1px;}
+.day-cell.is-today .day-cell-header{background:rgba(201,168,76,.05);}
+.day-cell-body{flex:1;padding:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;}
+.dct{font-size:7.5px;letter-spacing:.07em;text-transform:uppercase;padding:3px 6px;border-radius:10px;text-align:center;width:100%;border:1px solid transparent;margin-bottom:3px;}
+.dct.t-push{background:rgba(201,168,76,.1);color:var(--gold);border-color:rgba(201,168,76,.18);}
+.dct.t-create{background:rgba(74,122,48,.12);color:var(--green-light);border-color:rgba(74,122,48,.22);}
+.dct.t-skill{background:rgba(106,74,160,.14);color:var(--purple-light);border-color:rgba(106,74,160,.22);}
+.dct.t-rest{background:rgba(74,94,79,.12);color:#7aab85;border-color:rgba(74,94,79,.22);}
+.dct.t-empty{background:rgba(255,255,255,.02);color:rgba(255,255,255,.15);border-color:rgba(255,255,255,.05);}
+.day-sessions{display:flex;flex-direction:column;gap:2px;width:100%;}
+.session-pip{font-size:7px;letter-spacing:.03em;padding:2px 5px;border-radius:2px;color:rgba(255,255,255,.4);background:rgba(255,255,255,.03);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pip-morning{border-left:2px solid rgba(201,168,76,.5);}
+.pip-afternoon{border-left:2px solid rgba(42,138,118,.5);}
+.pip-night{border-left:2px solid rgba(154,122,48,.5);}
+.pip-skill{border-left:2px solid rgba(106,74,160,.5)!important;}
+.week-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:22px;animation:fadeDown .8s .16s ease both;}
+.wscard{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:16px 12px;text-align:center;transition:all .2s;}
+.wscard:hover{background:rgba(255,255,255,.035);}
+.wsnum{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1;}
+.wsnum.cp{color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.25);}
+.wsnum.cc{color:var(--green-light);text-shadow:0 0 20px rgba(74,122,48,.25);}
+.wsnum.cs{color:var(--purple-light);text-shadow:0 0 20px rgba(106,74,160,.3);}
+.wsnum.cr{color:#7aab85;text-shadow:0 0 20px rgba(74,122,79,.2);}
+.wslabel{font-size:8px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-top:6px;}
+.skill-insight{background:linear-gradient(135deg,rgba(106,74,160,.08),rgba(106,74,160,.02));border:1px solid rgba(106,74,160,.18);border-left:2px solid rgba(184,160,224,.4);border-radius:1px;padding:12px 18px;margin-bottom:20px;font-size:11px;color:rgba(184,160,224,.65);line-height:1.8;animation:fadeDown .5s ease both;}
+.skill-insight strong{color:var(--purple-light);}
+.skill-insight.hidden{display:none;}
+.advisory{margin-top:14px;padding:12px 18px;background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.12);border-left:2px solid rgba(201,168,76,.3);border-radius:1px;font-size:11px;color:rgba(201,168,76,.55);line-height:1.8;display:none;}
+.advisory strong{color:var(--gold);}
+.week-notes-title{font-size:9px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:9px;}
+.week-notes-input{width:100%;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:1px;padding:13px 16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--cream);resize:none;line-height:1.75;min-height:76px;outline:none;transition:border-color .25s;}
+.week-notes-input::placeholder{color:var(--muted);}
+.week-notes-input:focus{border-color:rgba(201,168,76,.22);}
+.fortress-header{text-align:center;margin-bottom:36px;animation:fadeDown .8s ease both;}
+.fortress-header h2{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,56px);font-weight:400;color:var(--cream);line-height:1;}
+.fortress-header h2 em{font-style:italic;color:var(--gold);}
+.fortress-header p{font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:10px;text-transform:uppercase;}
+.purpose-bar{background:linear-gradient(135deg,rgba(201,168,76,.07),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.14);border-left:2px solid rgba(201,168,76,.4);border-radius:1px;padding:14px 20px;margin-bottom:28px;font-size:11px;color:rgba(201,168,76,.6);line-height:1.85;font-style:italic;animation:fadeDown .8s .05s ease both;}
+.purpose-bar strong{color:var(--gold);font-style:normal;}
+.fortress-section{border-radius:1px;overflow:hidden;margin-bottom:3px;animation:slideUp .5s ease both;}
+.fortress-section:nth-child(1){animation-delay:.03s}.fortress-section:nth-child(2){animation-delay:.06s}
+.fortress-section:nth-child(3){animation-delay:.09s}.fortress-section:nth-child(4){animation-delay:.12s}
+.fortress-section:nth-child(5){animation-delay:.15s}.fortress-section:nth-child(6){animation-delay:.18s}
+.fortress-section-header{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;border-left:2px solid transparent;transition:all .25s;user-select:none;position:relative;}
+.fortress-section-header::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.025),transparent);opacity:0;transition:opacity .25s;pointer-events:none;}
+.fortress-section-header:hover::after{opacity:1;}
+.fs-manifesto .fortress-section-header{background:#100d08;border-left-color:var(--gold);}
+.fs-anchor .fortress-section-header{background:#0a0812;border-left-color:var(--purple-light);}
+.fs-core5 .fortress-section-header{background:#071210;border-left-color:var(--teal-light);}
+.fs-phrases .fortress-section-header{background:#0f0f1a;border-left-color:var(--sky-light);}
+.fs-weekly .fortress-section-header{background:#0a0f07;border-left-color:var(--green-light);}
+.fs-snapshot .fortress-section-header{background:#0e0c07;border-left-color:var(--amber-light);}
+.fs-manifesto .fortress-inner{background:#0d0a06;}
+.fs-anchor .fortress-inner{background:#07060f;}
+.fs-core5 .fortress-inner{background:#050f0d;}
+.fs-phrases .fortress-inner{background:#08080f;}
+.fs-weekly .fortress-inner{background:#060d04;}
+.fs-snapshot .fortress-inner{background:#0b0905;}
+.fs-manifesto.open{box-shadow:0 0 28px rgba(201,168,76,.06);}
+.fs-core5.open{box-shadow:0 0 28px rgba(42,138,118,.07);}
+.fs-phrases.open{box-shadow:0 0 28px rgba(42,90,138,.06);}
+.fs-snapshot.open{box-shadow:0 0 28px rgba(154,122,48,.06);}
+.fs-icon{font-size:18px;flex-shrink:0;}
+.fs-label{flex:1;}
+.fs-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--cream);line-height:1;}
+.fs-sub{font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+.fs-caret{width:22px;height:22px;border:1px solid rgba(255,255,255,.07);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);transition:all .3s;flex-shrink:0;}
+.fortress-section.open .fs-caret{transform:rotate(180deg);border-color:rgba(201,168,76,.2);color:var(--gold-dim);}
+.fortress-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+.fortress-section.open .fortress-body{max-height:2000px;}
+.fortress-inner{padding:0 20px 22px;}
+.fort-divider{height:1px;margin:0 0 16px;background:linear-gradient(90deg,rgba(255,255,255,.06),transparent);}
+.manifesto-statement{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;font-style:italic;color:rgba(245,239,224,.75);line-height:1.8;margin-bottom:18px;padding:14px 18px;border-left:1px solid rgba(201,168,76,.2);background:rgba(201,168,76,.03);}
+.manifesto-values{display:flex;flex-direction:column;gap:2px;margin-bottom:16px;}
+.manifesto-value{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:1px;background:rgba(255,255,255,.02);font-size:11.5px;color:rgba(245,239,224,.75);line-height:1.6;}
+.manifesto-value::before{content:'—';color:var(--gold-dim);flex-shrink:0;margin-top:1px;}
+.say-aloud{background:linear-gradient(135deg,rgba(106,74,160,.08),rgba(106,74,160,.03));border:1px solid rgba(106,74,160,.18);border-left:2px solid rgba(184,160,224,.4);border-radius:1px;padding:14px 18px;margin-bottom:14px;font-family:'Playfair Display',serif;font-size:14px;font-style:italic;color:rgba(184,160,224,.75);line-height:1.85;}
+.say-aloud-label{font-family:'DM Mono',monospace;font-style:normal;font-size:8px;letter-spacing:.2em;color:var(--purple-light);text-transform:uppercase;margin-bottom:8px;opacity:.7;}
+.core5-grid{display:flex;flex-direction:column;gap:3px;}
+.core5-card{border-radius:1px;overflow:hidden;border:1px solid rgba(255,255,255,.05);transition:all .2s;}
+.core5-card:hover{border-color:rgba(42,138,118,.2);}
+.core5-card-header{display:flex;align-items:center;gap:12px;padding:12px 15px;cursor:pointer;background:rgba(42,138,118,.05);user-select:none;transition:filter .2s;}
+.core5-card-header:hover{filter:brightness(1.15);}
+.core5-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:rgba(42,138,118,.5);line-height:1;min-width:28px;}
+.core5-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--cream);flex:1;}
+.core5-body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 15px;}
+.core5-card.open .core5-body{max-height:600px;}
+.core5-def{padding:12px 0 4px;font-size:11px;color:rgba(245,239,224,.7);line-height:1.8;}
+.core5-def strong{color:var(--teal-light);}
+.core5-formula{background:rgba(42,138,118,.06);border:1px solid rgba(42,138,118,.14);border-radius:1px;padding:8px 12px;margin:8px 0;font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:rgba(114,196,178,.8);}
+.core5-examples{display:flex;flex-direction:column;gap:2px;margin:8px 0 12px;}
+.core5-example{font-size:10.5px;color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;align-items:flex-start;}
+.core5-example::before{content:'·';color:var(--teal-light);flex-shrink:0;}
+.core5-recall{background:rgba(42,138,118,.04);border-left:2px solid rgba(114,196,178,.3);padding:8px 12px;margin-bottom:12px;font-size:10.5px;font-style:italic;color:rgba(114,196,178,.6);line-height:1.75;}
+.core5-recall-label{font-style:normal;font-size:8px;letter-spacing:.15em;color:var(--teal-light);text-transform:uppercase;margin-bottom:4px;opacity:.7;}
+.phrase-grid{display:flex;flex-direction:column;gap:2px;}
+.phrase-card{padding:11px 14px;border-radius:1px;background:rgba(42,90,138,.04);border:1px solid rgba(42,90,138,.08);border-left:2px solid rgba(112,168,216,.3);font-family:'Playfair Display',serif;font-size:14px;font-style:italic;color:rgba(245,239,224,.7);line-height:1.6;transition:all .2s;}
+.phrase-card:hover{background:rgba(42,90,138,.08);color:var(--cream);}
+.phrase-section-label{font-family:'DM Mono',monospace;font-style:normal;font-size:8px;letter-spacing:.22em;color:var(--sky-light);text-transform:uppercase;margin:16px 0 8px;opacity:.65;}
+.snapshot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.snapshot-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:14px 16px;}
+.snapshot-card-title{font-size:8px;letter-spacing:.2em;color:var(--amber-light);text-transform:uppercase;margin-bottom:10px;opacity:.7;}
+.snapshot-item{font-size:10.5px;color:rgba(245,239,224,.6);line-height:1.75;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:8px;}
+.snapshot-item::before{content:'·';color:var(--amber-light);flex-shrink:0;}
+.daily-statement{grid-column:1/-1;background:linear-gradient(135deg,rgba(154,122,48,.08),rgba(154,122,48,.02));border:1px solid rgba(154,122,48,.18);border-left:2px solid rgba(212,176,96,.4);border-radius:1px;padding:16px 20px;margin-top:4px;font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:rgba(212,176,96,.65);line-height:1.9;text-align:center;}
+.recall-checks{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.recall-item{display:flex;align-items:flex-start;gap:12px;padding:9px 12px;border-radius:1px;background:rgba(255,255,255,.02);cursor:pointer;transition:all .2s;border:1px solid transparent;}
+.recall-item:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.04);}
+.recall-item.done{opacity:.35;}
+.recall-check{width:14px;height:14px;border:1px solid rgba(255,255,255,.12);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--teal-light);transition:all .2s;}
+.recall-item.done .recall-check{background:rgba(42,138,118,.18);border-color:rgba(114,196,178,.3);box-shadow:0 0 6px rgba(42,138,118,.2);}
+.recall-item.done .recall-text{text-decoration:line-through;color:var(--muted);}
+.recall-text{font-size:11.5px;line-height:1.65;color:rgba(245,239,224,.8);flex:1;}
+.recall-progress-wrap{margin:16px 0 4px;}
+.recall-progress-label{display:flex;justify-content:space-between;font-size:8px;letter-spacing:.15em;color:var(--muted);margin-bottom:6px;text-transform:uppercase;}
+.recall-track{height:1px;background:rgba(255,255,255,.06);}
+.recall-fill{height:100%;background:linear-gradient(90deg,var(--teal),rgba(114,196,178,.8));transition:width .5s ease;}
+.income-header{text-align:center;margin-bottom:32px;}
+.income-header h2{font-family:'Playfair Display',serif;font-size:clamp(32px,6vw,54px);font-weight:400;color:var(--cream);line-height:1;}
+.income-header h2 em{font-style:italic;color:var(--gold);}
+.income-header p{font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:10px;text-transform:uppercase;}
+.income-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;align-items:center;}
+.goal-ring-wrap{grid-column:1;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.goal-ring{position:relative;width:130px;height:130px;}
+.goal-ring svg{transform:rotate(-90deg);}
+.goal-ring-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:8;}
+.goal-ring-fill{fill:none;stroke:url(#goldGrad);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);}
+.goal-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.goal-ring-pct{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;color:var(--gold);line-height:1;}
+.goal-ring-label{font-size:8px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.income-stats{grid-column:2/4;display:flex;flex-direction:column;gap:8px;}
+.istat{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:14px 16px;}
+.istat-label{font-size:8px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.istat-value{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:var(--cream);line-height:1;}
+.istat-value.green{color:#7aab85;}
+.istat-value.gold{color:var(--gold);}
+.istat-sub{font-size:9px;color:var(--muted);margin-top:3px;}
+.month-nav{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:20px;}
+.month-nav-btn{background:none;border:1px solid rgba(255,255,255,.07);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;padding:6px 12px;border-radius:1px;cursor:pointer;transition:all .2s;}
+.month-nav-btn:hover{border-color:rgba(201,168,76,.25);color:var(--gold-dim);}
+.month-nav-label{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--cream);min-width:160px;text-align:center;}
+.stream-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px;}
+.stream-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:1px;padding:16px;}
+.stream-card.vip{border-left:2px solid var(--gold);}
+.stream-card.digital{border-left:2px solid var(--purple-light);}
+.stream-card.coaching{border-left:2px solid var(--teal-light);}
+.stream-card.hub{border-left:2px solid var(--rose-light);}
+.stream-card.acuity{border-left:2px solid var(--sky-light);}
+.stream-card.website{border-left:2px solid var(--amber-light);}
+.stream-name{font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.stream-amount{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:var(--cream);line-height:1;}
+.stream-amount.gold{color:var(--gold);}
+.stream-amount.purple{color:var(--purple-light);}
+.stream-amount.teal{color:var(--teal-light);}
+.stream-amount.rose{color:var(--rose-light);}
+.stream-amount.sky{color:var(--sky-light);}
+.stream-amount.amber{color:var(--amber-light);}
+.stream-count{font-size:9px;color:var(--muted);margin-top:4px;}
+.stream-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;margin-top:10px;overflow:hidden;}
+.stream-bar-fill{height:100%;border-radius:1px;transition:width .6s ease;}
+.stream-bar-fill.gold{background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+.stream-bar-fill.purple{background:linear-gradient(90deg,var(--purple),var(--purple-light));}
+.stream-bar-fill.teal{background:linear-gradient(90deg,var(--teal),var(--teal-light));}
+.stream-bar-fill.rose{background:linear-gradient(90deg,var(--rose),var(--rose-light));}
+.stream-bar-fill.sky{background:linear-gradient(90deg,var(--sky),var(--sky-light));}
+.stream-bar-fill.amber{background:linear-gradient(90deg,var(--amber),var(--amber-light));}
+.log-form{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:1px;padding:18px 20px;margin-bottom:16px;}
+.log-form-title{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+.log-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+.log-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px;}
+.log-field-label{font-size:8px;letter-spacing:.15em;color:var(--muted2);text-transform:uppercase;}
+.log-select,.log-input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1px;padding:9px 11px;font-family:'DM Mono',monospace;font-size:11px;color:var(--cream);outline:none;transition:border-color .2s;width:100%;}
+.log-select:focus,.log-input:focus{border-color:rgba(201,168,76,.28);}
+.log-select option{background:#1a1410;}
+.log-input::placeholder{color:var(--muted);}
+.log-btn{background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.1));border:1px solid rgba(201,168,76,.28);border-radius:1px;padding:9px 18px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.log-btn:hover{background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.16));}
+.tier-row{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+.tier-btn{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:1px;padding:6px 11px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;color:var(--muted2);cursor:pointer;transition:all .2s;}
+.tier-btn:hover{border-color:rgba(201,168,76,.25);color:var(--gold-dim);}
+.tier-btn.selected{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:var(--gold);}
+.log-list-title{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.log-list{display:flex;flex-direction:column;gap:2px;margin-bottom:20px;}
+.log-entry{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.02);border-radius:1px;border:1px solid rgba(255,255,255,.04);transition:all .2s;}
+.log-entry:hover{background:rgba(255,255,255,.035);}
+.log-entry-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.log-entry-dot.vip{background:var(--gold);box-shadow:0 0 6px rgba(201,168,76,.4);}
+.log-entry-dot.digital{background:var(--purple-light);box-shadow:0 0 6px rgba(184,160,224,.35);}
+.log-entry-dot.coaching{background:var(--teal-light);box-shadow:0 0 6px rgba(42,138,118,.4);}
+.log-entry-dot.hub{background:var(--rose-light);box-shadow:0 0 6px rgba(155,64,96,.35);}
+.log-entry-dot.acuity{background:var(--sky-light);box-shadow:0 0 6px rgba(42,90,138,.35);}
+.log-entry-dot.website{background:var(--amber-light);box-shadow:0 0 6px rgba(154,122,48,.35);}
+.log-entry-info{flex:1;}
+.log-entry-desc{font-size:11px;color:var(--cream);}
+.log-entry-date{font-size:9px;color:var(--muted);margin-top:2px;}
+.log-entry-amount{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;color:var(--gold);}
+.log-entry-del{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:2px 6px;border-radius:1px;transition:color .2s;opacity:0;}
+.log-entry:hover .log-entry-del{opacity:1;}
+.log-entry-del:hover{color:var(--rose-light);}
+.log-empty{text-align:center;padding:24px;font-size:11px;color:var(--muted);font-style:italic;}
+.history-section{margin-top:8px;}
+.history-title{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.history-title::after{content:'▾';transition:transform .25s;}
+.history-title.open::after{transform:rotate(180deg);}
+.history-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.history-body.open{max-height:600px;}
+.history-month{display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.02);border-radius:1px;border:1px solid rgba(255,255,255,.04);margin-bottom:2px;}
+.history-month-label{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream);flex:1;}
+.history-month-total{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);}
+.history-month-bar{height:1px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-top:6px;}
+.history-month-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:1px;}
+.history-month-pct{font-size:9px;color:var(--muted);}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchView('daily',this)">Daily Flow</button>
+  <button class="nav-tab" onclick="switchView('weekly',this)">Week Planner</button>
+  <button class="nav-tab" onclick="switchView('fortress',this)">🏰 Fortress</button>
+  <button class="nav-tab" onclick="switchView('income',this)">💰 $5K</button>
+</div>
+
+<!-- ══ DAILY VIEW ══ -->
+<div class="view active" id="view-daily">
+<header class="header">
+  <div class="header-eyebrow">Leo Sun · Libra Rising · Sag Moon · Mama · Builder</div>
+  <h1>Daily <em>Flow</em></h1>
+  <div class="header-rule"></div>
+  <p class="header-sub">$5K/Month Project · Skill-Building Built In · Real Life Included</p>
+</header>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold);color:var(--gold)"></div>Business</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--rose);color:var(--rose)"></div>Toddler window</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal);color:var(--teal)"></div>Older kids on deck</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber);color:var(--amber)"></div>Night session</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple);color:var(--purple)"></div>Skill building</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4A7A50;color:#4A7A50"></div>Restore</div>
+</div>
+<div class="day-toggle">
+  <button class="day-btn active" onclick="setDay('push',this)">🔥 Push Day</button>
+  <button class="day-btn" onclick="setDay('create',this)">✨ Create Day</button>
+  <button class="day-btn" onclick="setDay('skill',this)">🛡 Skill Day</button>
+  <button class="day-btn" onclick="setDay('rest',this)">🌿 Rest Day</button>
+</div>
+<div class="family-bar" id="family-bar"></div>
+<div class="progress-wrap">
+  <div class="progress-label"><span>Daily Progress</span><span id="progress-text">0 / 0 complete</span></div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+<div class="blocks" id="blocks"></div>
+<button class="reset-btn" onclick="resetDay()">↺ &nbsp; Reset Day</button>
+<div class="mantra"><div class="mantra-rule"></div><p id="mantra-text"></p></div>
+</div>
+
+<!-- ══ WEEKLY VIEW ══ -->
+<div class="view" id="view-weekly">
+<div class="week-header"><h2>Weekly <em>Rhythm</em></h2><p>Select a type · tap a day · build your week</p></div>
+<div class="astro-band"><strong>♌ You have 3 real work windows every day:</strong> Morning CEO block, afternoon family handoff, night session after bedtime. Most mamas get one window. You have three — plus a Skill Day type for lab and training work. <strong>2–3 skill nights per week in night sessions, plus one full Skill Day, is your sweet spot.</strong></div>
+<div class="session-prefs">
+  <div class="session-prefs-title">Active Sessions<span class="scount-badge" id="session-badge">3 sessions active</span></div>
+  <div class="session-rows">
+    <div class="session-row">
+      <div class="session-row-info"><div class="session-row-label">Morning Session</div><div class="session-row-sub">10AM–1PM · CEO + visibility · toddler settled</div></div>
+      <label class="toggle-wrap"><input type="checkbox" checked onchange="updateSessionPrefs()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="session-row">
+      <div class="session-row-info"><div class="session-row-label">Afternoon Session</div><div class="session-row-sub">2:30–5PM · older kids + partner on deck</div></div>
+      <label class="toggle-wrap"><input type="checkbox" checked onchange="updateSessionPrefs()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="session-row">
+      <div class="session-row-info"><div class="session-row-label">Night Session</div><div class="session-row-sub">Kids in bed until spouse home · deep work or skill labs</div></div>
+      <label class="toggle-wrap"><input type="checkbox" checked onchange="updateSessionPrefs()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+</div>
+<div class="rhythm-templates">
+  <div class="rhythm-title">Quick Templates</div>
+  <div class="template-row">
+    <button class="template-btn" onclick="applyTemplate('balanced')">⚖ Balanced</button>
+    <button class="template-btn" onclick="applyTemplate('heavy')">🔥 Push Heavy</button>
+    <button class="template-btn" onclick="applyTemplate('creative')">✨ Create Heavy</button>
+    <button class="template-btn" onclick="applyTemplate('skillweek')">🛡 Skill Focus</button>
+    <button class="template-btn" onclick="applyTemplate('contentweek')" style="border-color:rgba(201,168,76,.2);color:var(--gold-dim);">🎬 Content Week</button>
+    <button class="template-btn" onclick="applyTemplate('clear')">↺ Clear</button>
+  </div>
+</div>
+<div class="day-type-legend">
+  <div class="dtype-pill push-pill selected" onclick="selectType('push',this)">🔥 Push</div>
+  <div class="dtype-pill create-pill" onclick="selectType('create',this)">✨ Create</div>
+  <div class="dtype-pill skill-pill" onclick="selectType('skill',this)">🛡 Skill</div>
+  <div class="dtype-pill rest-pill" onclick="selectType('rest',this)">🌿 Rest</div>
+</div>
+<div class="week-grid" id="week-grid"></div>
+<div class="skill-insight hidden" id="skill-insight"></div>
+<div class="week-summary">
+  <div class="wscard"><div class="wsnum cp" id="sum-push">0</div><div class="wslabel">Push Days</div></div>
+  <div class="wscard"><div class="wsnum cc" id="sum-create">0</div><div class="wslabel">Create Days</div></div>
+  <div class="wscard"><div class="wsnum cs" id="sum-skill">0</div><div class="wslabel">Skill Days</div></div>
+  <div class="wscard"><div class="wsnum cr" id="sum-rest">0</div><div class="wslabel">Rest Days</div></div>
+</div>
+<div class="week-notes-title">Week Intention</div>
+<textarea class="week-notes-input" id="week-notes" placeholder="Revenue goal, VIP bookings, skill module to complete, content theme, $5K milestone..."></textarea>
+<div class="advisory" id="week-advisory"></div>
+</div>
+<!-- ══ FORTRESS VIEW ══ -->
+<div class="view" id="view-fortress">
+<div class="fortress-header"><h2>The <em>Fortress</em></h2><p>Manifesto · Identity · Knowledge Recall</p></div>
+<div class="purpose-bar"><strong>This is not about doing more.</strong> This is about embodying what you already know so your confidence comes from memory, mastery, and identity — not notes, tabs, or planning spirals. Return here daily to anchor your identity, strengthen recall, and speak with clarity.</div>
+<div class="recall-progress-wrap">
+  <div class="recall-progress-label"><span>Today's Recall Practice</span><span id="recall-progress-text">0 / 0 complete</span></div>
+  <div class="recall-track"><div class="recall-fill" id="recall-fill" style="width:0%"></div></div>
+</div>
+<div id="fortress-sections">
+
+<div class="fortress-section fs-manifesto open" id="fs-manifesto">
+  <div class="fortress-section-header" onclick="toggleFs('manifesto')"><div class="fs-icon">🏰</div><div class="fs-label"><div class="fs-name">Personal Manifesto</div><div class="fs-sub">Founder · Protector · Translator · Builder</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+    <div class="manifesto-statement">I am a builder of safety, clarity, and digital sovereignty.<br>I believe technology should serve people — not intimidate, exploit, or overwhelm them.<br>My role is to translate complex systems into language everyday people can trust, understand, and use.</div>
+    <div class="phrase-section-label">What I Value</div>
+    <div class="manifesto-values">
+      <div class="manifesto-value">Clarity over complexity</div>
+      <div class="manifesto-value">Confidence over credentials</div>
+      <div class="manifesto-value">Integrity over performance</div>
+      <div class="manifesto-value">Embodied knowledge over memorized jargon</div>
+      <div class="manifesto-value">Impact over impressing</div>
+    </div>
+    <div class="phrase-section-label">What I Allow</div>
+    <div class="manifesto-values">
+      <div class="manifesto-value">I am allowed to be in progress</div>
+      <div class="manifesto-value">I am allowed to speak before perfection</div>
+      <div class="manifesto-value">I am allowed to teach while learning</div>
+      <div class="manifesto-value">I am allowed to build while becoming</div>
+    </div>
+    <div class="phrase-section-label">Where My Work Lives</div>
+    <div class="manifesto-values">
+      <div class="manifesto-value">Cybersecurity</div>
+      <div class="manifesto-value">Design &amp; usability</div>
+      <div class="manifesto-value">Wellness &amp; intentional systems</div>
+    </div>
+    <div class="manifesto-statement" style="margin-top:16px;font-size:14px;">I am not late. I am early in something meaningful.<br>Every day, I choose to embody what I know — not just plan what I will do.</div>
+  </div></div>
+</div>
+
+<div class="fortress-section fs-anchor" id="fs-anchor">
+  <div class="fortress-section-header" onclick="toggleFs('anchor')"><div class="fs-icon">🧭</div><div class="fs-label"><div class="fs-name">Identity Anchor</div><div class="fs-sub">1 Minute · Say Out Loud · Daily</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+    <div class="say-aloud"><div class="say-aloud-label">Say this out loud now</div>"I understand digital safety. I can explain cybersecurity in everyday language. My knowledge is real, usable, and growing."</div>
+    <div class="phrase-section-label">Then Answer — Out Loud or In Writing</div>
+    <div class="recall-checks" id="anchor-checks">
+      <div class="recall-item" onclick="toggleRecall('anchor-0',this)"><div class="recall-check"></div><div class="recall-text">Who do I help today?</div></div>
+      <div class="recall-item" onclick="toggleRecall('anchor-1',this)"><div class="recall-check"></div><div class="recall-text">What problem do I solve?</div></div>
+      <div class="recall-item" onclick="toggleRecall('anchor-2',this)"><div class="recall-check"></div><div class="recall-text">Why does my knowledge matter?</div></div>
+      <div class="recall-item" onclick="toggleRecall('anchor-3',this)"><div class="recall-check"></div><div class="recall-text">Said my identity statement out loud</div></div>
+    </div>
+  </div></div>
+</div>
+
+<div class="fortress-section fs-core5" id="fs-core5">
+  <div class="fortress-section-header" onclick="toggleFs('core5')"><div class="fs-icon">🔐</div><div class="fs-label"><div class="fs-name">Daily Core 5 + Monthly Slot</div><div class="fs-sub">Non-Negotiable Memory Stack · Tap Each to Review</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+  <div class="core5-grid">
+
+    <div class="core5-card" id="c5-0">
+      <div class="core5-card-header" onclick="toggleC5(0)"><div class="core5-num">1</div><div class="core5-title">Cybersecurity</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Definition:</strong> The practice of protecting systems, networks, devices, and data from unauthorized access, misuse, disruption, or harm.</div>
+        <div class="core5-examples"><div class="core5-example">Protecting accounts, devices, and information</div><div class="core5-example">Preventing unauthorized access</div><div class="core5-example">Reducing risk from digital threats</div><div class="core5-example">Responding to and recovering from incidents</div></div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"Cybersecurity is about protecting systems, people, and data from unauthorized access, misuse, and harm."</div>
+        <div class="recall-item" onclick="toggleRecall('c5-0',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said this definition out loud ✓</div></div>
+      </div>
+    </div>
+
+    <div class="core5-card" id="c5-1">
+      <div class="core5-card-header" onclick="toggleC5(1)"><div class="core5-num">2</div><div class="core5-title">Digital Hygiene</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Definition:</strong> The ongoing habits and practices individuals use to maintain security, privacy, and safety in digital spaces.</div>
+        <div class="core5-examples"><div class="core5-example">Using strong, unique passwords</div><div class="core5-example">Keeping software and devices updated</div><div class="core5-example">Recognizing suspicious messages</div><div class="core5-example">Enabling MFA on all accounts</div></div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"Digital hygiene is how people lower their risk over time — just like brushing teeth lowers the risk of cavities."</div>
+        <div class="recall-item" onclick="toggleRecall('c5-1',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said this definition out loud ✓</div></div>
+      </div>
+    </div>
+
+    <div class="core5-card" id="c5-2">
+      <div class="core5-card-header" onclick="toggleC5(2)"><div class="core5-num">3</div><div class="core5-title">Privacy vs Security</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Privacy:</strong> The ability to control how personal data is collected, used, shared, and stored.</div>
+        <div class="core5-def"><strong>Security:</strong> The set of protections and safeguards that prevent unauthorized access to systems and data.</div>
+        <div class="core5-formula">Privacy = Control · Security = Protection · You need both.</div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"Privacy is about control. Security is about protection. They work together — but they are not the same."</div>
+        <div class="recall-item" onclick="toggleRecall('c5-2',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said both definitions out loud ✓</div></div>
+      </div>
+    </div>
+
+    <div class="core5-card" id="c5-3">
+      <div class="core5-card-header" onclick="toggleC5(3)"><div class="core5-num">4</div><div class="core5-title">MFA</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Definition:</strong> Multi-factor authentication is a security method that requires two or more forms of verification to access an account.</div>
+        <div class="core5-examples"><div class="core5-example">Something you know — password</div><div class="core5-example">Something you have — phone, authenticator app</div><div class="core5-example">Something you are — biometrics</div></div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"MFA adds a second lock to the door — even if the first lock fails, your account stays protected."</div>
+        <div class="recall-item" onclick="toggleRecall('c5-3',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said this definition out loud ✓</div></div>
+      </div>
+    </div>
+
+    <div class="core5-card" id="c5-4">
+      <div class="core5-card-header" onclick="toggleC5(4)"><div class="core5-num">5</div><div class="core5-title">Risk</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Definition:</strong> The potential for loss or harm when a threat exploits a vulnerability, resulting in an impact.</div>
+        <div class="core5-formula">Risk = Exposure + Vulnerability + Impact</div>
+        <div class="core5-examples"><div class="core5-example"><strong style="color:var(--teal-light)">Exposure</strong> — what is accessible or visible</div><div class="core5-example"><strong style="color:var(--teal-light)">Vulnerability</strong> — a weakness that can be exploited</div><div class="core5-example"><strong style="color:var(--teal-light)">Impact</strong> — the damage that would occur if exploited</div></div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"Risk isn't about fear — it's about understanding what could go wrong and how bad it would be if it did."</div>
+        <div class="recall-item" onclick="toggleRecall('c5-4',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said this definition out loud ✓</div></div>
+      </div>
+    </div>
+
+    <!-- UPDATE MONTHLY: Change the title and content below to match the current CyberSecure Hub live call topic -->
+    <div class="core5-card" id="c5-5">
+      <div class="core5-card-header" onclick="toggleC5(5)"><div class="core5-num">6</div><div class="core5-title">This Month: [Topic]</div></div>
+      <div class="core5-body">
+        <div class="core5-def"><strong>Definition:</strong> [Add the definition for this month's live call topic here.]</div>
+        <div class="core5-formula">[Key formula or framework — update monthly]</div>
+        <div class="core5-examples"><div class="core5-example">[Example 1 — update monthly]</div><div class="core5-example">[Example 2 — update monthly]</div><div class="core5-example">[Example 3 — update monthly]</div></div>
+        <div class="core5-recall"><div class="core5-recall-label">Say it plain</div>"[Plain language version — update monthly]"</div>
+        <div class="recall-item" onclick="toggleRecall('c5-5',this)" style="margin-bottom:10px"><div class="recall-check"></div><div class="recall-text">Said this month's definition out loud ✓</div></div>
+      </div>
+    </div>
+
+  </div></div></div>
+</div>
+<div class="fortress-section fs-phrases" id="fs-phrases">
+  <div class="fortress-section-header" onclick="toggleFs('phrases')"><div class="fs-icon">🗣️</div><div class="fs-label"><div class="fs-name">Power Phrases</div><div class="fs-sub">Memorization Bank · Signature Voice · Neuro Anchoring</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+    <div class="phrase-section-label">Signature Phrases — Reuse Until Natural</div>
+    <div class="phrase-grid">
+      <div class="phrase-card">"Digital safety is a life skill, not a tech skill."</div>
+      <div class="phrase-card">"Cybersecurity doesn't have to feel scary to be effective."</div>
+      <div class="phrase-card">"Small habits protect people more than complex tools."</div>
+      <div class="phrase-card">"You don't need to be technical to stay safe online."</div>
+      <div class="phrase-card">"My job is to make tech feel human."</div>
+    </div>
+    <div class="phrase-section-label">Authority Close</div>
+    <div class="phrase-grid"><div class="phrase-card" style="border-left-color:rgba(201,168,76,.4);color:rgba(245,239,224,.85);font-size:15px;">"Digital safety isn't about fear. It's about awareness. And awareness builds freedom."</div></div>
+    <div class="phrase-section-label">Confidence Language</div>
+    <div class="phrase-grid">
+      <div class="phrase-card">"I don't need to prove intelligence — I demonstrate clarity."</div>
+      <div class="phrase-card">"I don't memorize jargon — I understand systems."</div>
+      <div class="phrase-card">"I don't chase credibility — I build competence."</div>
+      <div class="phrase-card">"I trust my knowledge because I practice recall."</div>
+    </div>
+    <div class="phrase-section-label">Role Language</div>
+    <div class="phrase-grid">
+      <div class="phrase-card">"I translate complex systems into human understanding."</div>
+      <div class="phrase-card">"I build digital safety for everyday people."</div>
+      <div class="phrase-card">"I design systems that protect peace, not just data."</div>
+      <div class="phrase-card">"I combine tech, design, and human behavior."</div>
+    </div>
+    <div class="recall-item" onclick="toggleRecall('phrases-0',this)" style="margin-top:12px"><div class="recall-check"></div><div class="recall-text">Said 3+ phrases out loud today — including the authority close ✓</div></div>
+  </div></div>
+</div>
+
+<div class="fortress-section fs-weekly" id="fs-weekly">
+  <div class="fortress-section-header" onclick="toggleFs('weekly')"><div class="fs-icon">🎬</div><div class="fs-label"><div class="fs-name">Content Production System</div><div class="fs-sub">Mon Strategy · Tue Record · Wed Edit · Thu Publish · Fri Engage</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+    <div class="phrase-section-label">🧠 Monday — Strategy + Positioning</div>
+    <div class="phrase-grid" style="margin-bottom:12px;">
+      <div class="phrase-card" style="font-style:normal;font-size:11px;">1️⃣ Everyday Digital Safety<br><span style="font-size:9px;color:var(--muted)">MFA · Scam awareness · Kids + tech</span></div>
+      <div class="phrase-card" style="font-style:normal;font-size:11px;">2️⃣ Founder Security<br><span style="font-size:9px;color:var(--muted)">Designers + security · AI myths · Data hygiene</span></div>
+      <div class="phrase-card" style="font-style:normal;font-size:11px;">3️⃣ Calm Tech Philosophy<br><span style="font-size:9px;color:var(--muted)">Fear vs empowerment · Hygiene as self-care</span></div>
+      <div class="phrase-card" style="font-style:normal;font-size:11px;">4️⃣ Behind the Founder<br><span style="font-size:9px;color:var(--muted)">Your journey · Doubt → clarity · Systems</span></div>
+    </div>
+    <div class="recall-item" onclick="toggleRecall('cps-0',this)"><div class="recall-check"></div><div class="recall-text">Mon — Topic chosen + 3 teaching points drafted</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-1',this)"><div class="recall-check"></div><div class="recall-text">Mon — Hook written (10–15 seconds max)</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-2',this)"><div class="recall-check"></div><div class="recall-text">Mon — CTA aligned: membership, blog, or consult?</div></div>
+    <div class="phrase-section-label" style="margin-top:16px;">🎥 Tuesday — Record</div>
+    <div class="recall-item" onclick="toggleRecall('cps-3',this)"><div class="recall-check"></div><div class="recall-text">Tue — Video recorded</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-4',this)"><div class="recall-check"></div><div class="recall-text">Tue — Clean audio confirmed</div></div>
+    <div class="phrase-section-label" style="margin-top:16px;">✂️ Wednesday — Edit + Repurpose</div>
+    <div class="recall-item" onclick="toggleRecall('cps-5',this)"><div class="recall-check"></div><div class="recall-text">Wed — Reel clipped from main video</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-6',this)"><div class="recall-check"></div><div class="recall-text">Wed — Carousel drafted from 3 teaching points</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-7',this)"><div class="recall-check"></div><div class="recall-text">Wed — Quote graphic pulled</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-8',this)"><div class="recall-check"></div><div class="recall-text">Wed — Thumbnail created</div></div>
+    <div class="phrase-section-label" style="margin-top:16px;">🚀 Thursday — Publish</div>
+    <div class="recall-item" onclick="toggleRecall('cps-9',this)"><div class="recall-check"></div><div class="recall-text">Thu — Uploaded to YouTube with SEO keywords + tags</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-10',this)"><div class="recall-check"></div><div class="recall-text">Thu — Description includes 3 takeaways + all links</div></div>
+    <div class="phrase-section-label" style="margin-top:16px;">💬 Friday — Engagement</div>
+    <div class="recall-item" onclick="toggleRecall('cps-11',this)"><div class="recall-check"></div><div class="recall-text">Fri — Replied to comments on all platforms</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-12',this)"><div class="recall-check"></div><div class="recall-text">Fri — Commented on 3+ cybersecurity or founder posts</div></div>
+    <div class="recall-item" onclick="toggleRecall('cps-13',this)"><div class="recall-check"></div><div class="recall-text">Fri — Shared video in 1–2 relevant communities</div></div>
+  </div></div>
+</div>
+
+<div class="fortress-section fs-snapshot" id="fs-snapshot">
+  <div class="fortress-section-header" onclick="toggleFs('snapshot')"><div class="fs-icon">🧠</div><div class="fs-label"><div class="fs-name">Daily Fortress Snapshot</div><div class="fs-sub">Quick Glance · Who You Are · What You Know · What You Build</div></div><div class="fs-caret">▾</div></div>
+  <div class="fortress-body"><div class="fortress-inner"><div class="fort-divider"></div>
+    <div class="snapshot-grid">
+      <div class="snapshot-card"><div class="snapshot-card-title">Who I Am</div><div class="snapshot-item">I translate complex systems into human clarity</div><div class="snapshot-item">I build digital safety for everyday people</div><div class="snapshot-item">I design systems that protect peace, not just data</div></div>
+      <div class="snapshot-card"><div class="snapshot-card-title">What I Know</div><div class="snapshot-item">Cybersecurity = protection of systems, people, data</div><div class="snapshot-item">Digital hygiene = healthy digital habits over time</div><div class="snapshot-item">Privacy = control · Security = protection</div><div class="snapshot-item">Risk = exposure + vulnerability + impact</div><div class="snapshot-item">MFA = layered protection</div></div>
+      <div class="snapshot-card"><div class="snapshot-card-title">What I Build</div><div class="snapshot-item">Safety · Clarity · Structure</div><div class="snapshot-item">Confidence · Digital stability</div><div class="snapshot-item">Human-centered tech</div></div>
+      <div class="snapshot-card"><div class="snapshot-card-title">What I Believe</div><div class="snapshot-item">Simple systems outperform complex ones</div><div class="snapshot-item">Security must be human to work</div><div class="snapshot-item">Clarity creates confidence</div><div class="snapshot-item">Peace is a system · Trust is built</div></div>
+      <div class="daily-statement">"I am not behind.<br>I am not scattered.<br>I am not confused.<br>I am building foundations that last."</div>
+    </div>
+    <div class="recall-item" onclick="toggleRecall('snapshot-0',this)" style="margin-top:14px"><div class="recall-check"></div><div class="recall-text">Read the Daily Statement out loud ✓</div></div>
+  </div></div>
+</div>
+
+</div><!-- /fortress-sections -->
+</div><!-- /view-fortress -->
+<!-- ══ INCOME VIEW ══ -->
+<div class="view" id="view-income">
+<div class="income-header"><h2>The <em>$5K</em> Tracker</h2><p>VIP · Coaching · Hub · Acuity · Digital · Website</p></div>
+<div class="month-nav">
+  <button class="month-nav-btn" onclick="prevMonth()">&#9664;</button>
+  <div class="month-nav-label" id="month-label">March 2026</div>
+  <button class="month-nav-btn" onclick="nextMonth()">&#9654;</button>
+</div>
+<div class="income-hero">
+  <div class="goal-ring-wrap">
+    <div class="goal-ring">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#8a6f2e"/><stop offset="100%" style="stop-color:#C9A84C"/></linearGradient></defs>
+        <circle class="goal-ring-bg" cx="65" cy="65" r="56"/>
+        <circle class="goal-ring-fill" id="ring-fill" cx="65" cy="65" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
+      </svg>
+      <div class="goal-ring-text"><div class="goal-ring-pct" id="ring-pct">0%</div><div class="goal-ring-label">of $5K</div></div>
+    </div>
+  </div>
+  <div class="income-stats">
+    <div class="istat"><div class="istat-label">Total Earned</div><div class="istat-value gold" id="stat-total">$0</div><div class="istat-sub" id="stat-remaining">$5,000 remaining</div></div>
+    <div class="istat"><div class="istat-label">Payments Logged</div><div class="istat-value" id="stat-count">0</div><div class="istat-sub">this month</div></div>
+  </div>
+</div>
+
+<div class="stream-grid">
+  <div class="stream-card vip"><div class="stream-name">VIP Design Days</div><div class="stream-amount gold" id="stream-vip-amt">$0</div><div class="stream-count" id="stream-vip-count">0 bookings</div><div class="stream-bar"><div class="stream-bar-fill gold" id="stream-vip-bar" style="width:0%"></div></div></div>
+  <div class="stream-card digital"><div class="stream-name">Digital Products</div><div class="stream-amount purple" id="stream-dig-amt">$0</div><div class="stream-count" id="stream-dig-count">0 sales</div><div class="stream-bar"><div class="stream-bar-fill purple" id="stream-dig-bar" style="width:0%"></div></div></div>
+  <div class="stream-card coaching"><div class="stream-name">1:1 Coaching</div><div class="stream-amount teal" id="stream-coaching-amt">$0</div><div class="stream-count" id="stream-coaching-count">0 clients</div><div class="stream-bar"><div class="stream-bar-fill teal" id="stream-coaching-bar" style="width:0%"></div></div></div>
+  <div class="stream-card hub"><div class="stream-name">CyberSecure Hub</div><div class="stream-amount rose" id="stream-hub-amt">$0</div><div class="stream-count" id="stream-hub-count">0 members</div><div class="stream-bar"><div class="stream-bar-fill rose" id="stream-hub-bar" style="width:0%"></div></div></div>
+  <div class="stream-card acuity"><div class="stream-name">Acuity Beauty Setup</div><div class="stream-amount sky" id="stream-acuity-amt">$0</div><div class="stream-count" id="stream-acuity-count">0 setups</div><div class="stream-bar"><div class="stream-bar-fill sky" id="stream-acuity-bar" style="width:0%"></div></div></div>
+  <div class="stream-card website"><div class="stream-name">Website in a Week</div><div class="stream-amount amber" id="stream-website-amt">$0</div><div class="stream-count" id="stream-website-count">0 projects</div><div class="stream-bar"><div class="stream-bar-fill amber" id="stream-website-bar" style="width:0%"></div></div></div>
+</div>
+
+<div class="log-form">
+  <div class="log-form-title">Log a Payment</div>
+  <div class="log-row">
+    <div class="log-field"><div class="log-field-label">Stream</div>
+      <select class="log-select" id="log-stream" onchange="handleStreamChange()">
+        <option value="vip">VIP Design Day</option>
+        <option value="digital">Digital Product</option>
+        <option value="coaching">1:1 Coaching ($1,500/mo)</option>
+        <option value="hub">CyberSecure Hub ($27/mo)</option>
+        <option value="acuity">Acuity Beauty Setup</option>
+        <option value="website">Website in a Week ($1,200)</option>
+      </select>
+    </div>
+    <div class="log-field"><div class="log-field-label">Amount</div><input class="log-input" id="log-amount" type="number" placeholder="$0" min="0"></div>
+    <div class="log-field" style="flex:2"><div class="log-field-label">Description</div><input class="log-input" id="log-desc" type="text" placeholder="e.g. Full Brand Kit — client name"></div>
+    <button class="log-btn" onclick="logPayment()">+ Log</button>
+  </div>
+  <div id="tier-row-vip">
+    <div class="log-field-label" style="margin-top:12px;margin-bottom:6px;">Quick-pick VIP tier</div>
+    <div class="tier-row">
+      <button class="tier-btn" onclick="selectTier(800,this)">Essentials — $800</button>
+      <button class="tier-btn" onclick="selectTier(1100,this)">Premium — $1,100</button>
+      <button class="tier-btn" onclick="selectTier(1500,this)">Full Brand Kit — $1,500</button>
+    </div>
+  </div>
+  <div id="tier-row-acuity" style="display:none">
+    <div class="log-field-label" style="margin-top:12px;margin-bottom:6px;">Quick-pick Acuity tier</div>
+    <div class="tier-row">
+      <button class="tier-btn" onclick="selectTier(350,this)">Basic — $350</button>
+      <button class="tier-btn" onclick="selectTier(650,this)">Full Setup — $650</button>
+      <button class="tier-btn" onclick="selectTier(1100,this)">Brand Bundle — $1,100</button>
+    </div>
+  </div>
+</div>
+
+<div class="log-list-title"><span>Payment Log</span><span id="log-month-label" style="font-style:italic;font-size:9px;color:var(--muted)"></span></div>
+<div class="log-list" id="log-list"><div class="log-empty">No payments logged yet this month.<br>Every booking starts here. 🦁</div></div>
+<div class="history-section">
+  <div class="history-title" id="history-toggle" onclick="toggleHistory()">Past Months</div>
+  <div class="history-body" id="history-body"><div id="history-list"></div></div>
+</div>
+</div><!-- /view-income -->
+
+</div><!-- /container -->
+<script>
+var D={push:{barCls:'',bar:"<strong>Push Day — 3 windows, one goal:</strong> Morning CEO block while toddler is settled. Afternoon with older kids on deck. Night session after bedtime for deep work.",mantra:'"Three windows. One goal.<br><em style=\'font-style:italic\'>The Leo who plans her pockets of time does not need a full uninterrupted day to win.</em>"',blocks:[{id:"ceo",cls:"bceo",time:"10:00 – 12:00",win:"win-biz",wl:"Window 1 · Morning",name:"CEO Morning",tag:"Brain on. Revenue first.",astro:"Leo Sun peaks early in the wake cycle — sharpest, most confident window. CEO decisions, outreach, and money conversations belong here before the house gets loud.",fam:"<strong>Toddler setup first:</strong> Rotating activity tray, favourite show, or sensory bin before you open the laptop.",skill:null,tasks:[{t:"Review pipeline — who needs a nudge, who is ready to book?",tag:"ceo"},{t:"Send 3 warm DMs or emails about VIP Design Days",tag:"vip"},{t:"Confirm booking link is live and shareable today",tag:"vip"},{t:"Declare today's number-one revenue goal out loud",tag:"ceo"}]},{id:"vis",cls:"bvis",time:"12:00 – 1:00",win:"win-biz",wl:"Window 1 · Closing",name:"Visibility Hour",tag:"Be seen. It is free. It compounds.",astro:"Libra Rising loves beauty and relatability. Content that feels like Kenyatta converts better than polished brand speak.",fam:"<strong>Lunch overlap:</strong> Feed the toddler, eat yourself, batch visibility tasks while they are settled.",skill:null,tasks:[{t:"Post 1 piece of content — VIP result, design tip, or real life moment",tag:"vis"},{t:"Leave 5 intentional comments on ideal client posts",tag:"vis"},{t:"Reply to DMs and Story interactions",tag:"vis"},{t:"Share one Story: behind the scenes or CEO mama moment",tag:"vis"}]},{id:"quiet",cls:"bquiet",time:"1:00 – 2:30",win:"win-baby",wl:"Toddler First",name:"Quiet Time + Reset",tag:"Protect the rhythm. Use the pocket.",astro:"Sag Moon runs on momentum — even fire needs a reset. This midday pause keeps you from burning through energy before the afternoon window.",fam:"<strong>Quiet time pocket:</strong> First 30 min focused business task, last 15 min to reset before the afternoon handoff.",skill:null,tasks:[{t:"Set up toddler's quiet time — rotate activities weekly",tag:"mama"},{t:"First 30 min: follow-up emails, proposals, or pipeline update",tag:"vip"},{t:"Last 15 min: breathe, snack, transition",tag:"soul"}]},{id:"kids",cls:"bkids",time:"2:30 – 5:00",win:"win-kids",wl:"Window 2 · Afternoon",name:"Older Kids On Deck",tag:"Lean on your village.",astro:"Libra Rising thrives when systems and relationships work in harmony.",fam:"<strong>Afternoon handoff:</strong> Brief the older kids, snack ready, activity set. Partner on standby.",skill:null,tasks:[{t:"Brief older kids on toddler duty — snack ready, task assigned",tag:"mama"},{t:"Deliver active VIP Design Day work or send client check-in",tag:"vip"},{t:"Send one follow-up to a warm lead",tag:"vip"},{t:"Update pipeline tracker: lead → discovery → proposal → booked → paid",tag:"ceo"},{t:"Reach out to 1 past client for a referral or testimonial",tag:"vip"}]},{id:"family",cls:"bclose",time:"5:00 – 8:30",win:"win-baby",wl:"Family Time",name:"Full Family Hours",tag:"Close the laptop. Be all the way here.",astro:"Sag Moon restores through genuine joy and connection — being fully present refuels your fire.",fam:"<strong>Everyone in the room:</strong> Dinner, homework, play, baths, bedtime. Phone face-down.",skill:null,tasks:[{t:"Laptop closed at 5PM — hard boundary on push days",tag:"mama"},{t:"Dinner together",tag:"soul"},{t:"Bedtime routine handled clean so night session starts without guilt",tag:"mama"}]},{id:"night",cls:"bnight",time:"8:30 – 11:00",win:"win-night",wl:"Window 3 · Night",name:"Night Work Session",tag:"Kids are down. This is yours.",astro:"Sag Moon gets a second wind when the pressure lifts — the quiet house after bedtime is your best strategy window.",fam:"<strong>Push day night session:</strong> Deep work and closes. VIP deliverables, sales page copy, pipeline strategy.",skill:"<strong>Skill bonus (if time allows):</strong> 30 min of TryHackMe. Short consistent bursts compound faster than one long irregular session.",tasks:[{t:"Deep work: VIP deliverables, course content, or sales page copy",tag:"vip"},{t:"Review tomorrow's pipeline — set top 3 tasks",tag:"ceo"},{t:"Engage evening DMs from ideal clients",tag:"vis"},{t:"Bonus: 30 min TryHackMe or training module",tag:"skill"}]},{id:"spouse",cls:"bspouse",time:"11:00 PM +",win:"win-spouse",wl:"Spouse Home · Wind Down",name:"Decompress Together",tag:"Honor the close.",astro:"Sag Moon can keep going indefinitely — when your spouse walks in, that's your signal.",fam:"<strong>Connection moment:</strong> 20 minutes of real conversation matters for both of you.",skill:null,tasks:[{t:"Close all tabs when spouse walks in — work is done",tag:"soul"},{t:"Brief decompression together",tag:"soul"},{t:"Sleep. Three full windows is a complete and powerful day.",tag:"soul"}]}]},create:{barCls:'',bar:"<strong>Create Day — build what sells while you sleep:</strong> Morning fast CEO check-in then creative mode. Afternoon deep create. Night session for scheduling and systemizing.",mantra:'"Creating in advance is how the Leo<br><em style=\'font-style:italic\'>stays unbothered, abundant, and ahead of the algorithm.</em>"',blocks:[{id:"ceo",cls:"bceo",time:"10:00 – 11:00",win:"win-soft",wl:"Light Touch",name:"Soft CEO",tag:"Quick check-in. Then go build.",astro:"Leo Sun loses creative fire when buried in logistics early. Keep admin short on create days.",fam:"<strong>Toddler morning window:</strong> Get them settled before you sit down.",skill:null,tasks:[{t:"Check emails and DMs — revenue-relevant replies only",tag:"ceo"},{t:"Confirm upcoming VIP bookings or discovery calls",tag:"vip"},{t:"Set your creative intention — what exactly are you building today?",tag:"ceo"}]},{id:"batch",cls:"bcreate",time:"11:00 – 1:00",win:"win-create",wl:"Window 1 · Create",name:"Content Batch",tag:"Write like Kenyatta. Not like a brand.",astro:"Mercury in Leo plus Libra Rising — natural communicator with great aesthetic instinct.",fam:"<strong>Lunch overlap:</strong> Set toddler up eating, write captions and scripts.",skill:null,tasks:[{t:"Write 3–5 captions, scripts, or carousel outlines",tag:"vis"},{t:"Record 1 video if energy is high",tag:"vis"},{t:"Pull 2–3 content ideas from real moments this week",tag:"vis"}]},{id:"quiet",cls:"bquiet",time:"1:00 – 2:30",win:"win-baby",wl:"Toddler First",name:"Quiet Time",tag:"Deep work in the pocket.",astro:"Sag Moon creates best when there's a clear destination — not 'work on stuff' but a specific goal.",fam:"<strong>Deep work window:</strong> CyberSecure Hub content, course modules, or design deliverables.",skill:null,tasks:[{t:"Set up toddler's quiet time",tag:"mama"},{t:"Work on CyberSecure Hub content — guide, checklist, or module",tag:"cyber"},{t:"Build or refine one digital product",tag:"cyber"}]},{id:"kids",cls:"bkids",time:"2:30 – 5:00",win:"win-kids",wl:"Window 2 · Afternoon",name:"Older Kids On Deck",tag:"Deep create block.",astro:"Sag Moon afternoon has heat — use it for big creative work that needs energy.",fam:"<strong>Afternoon handoff:</strong> Brief the older kids, then disappear into your work.",skill:null,tasks:[{t:"Brief older kids — snack ready, toddler covered",tag:"mama"},{t:"Design work: social templates, VIP deliverables, or portfolio pieces",tag:"vip"},{t:"Update offer page, sales copy, or booking confirmation sequence",tag:"ceo"},{t:"Organize client delivery folder",tag:"ceo"}]},{id:"family",cls:"bclose",time:"5:00 – 8:30",win:"win-baby",wl:"Family Time",name:"Mama Hours",tag:"You built a lot today. Be fully here.",astro:"Creation is energetically expensive — genuine presence with your kids refills you.",fam:null,skill:null,tasks:[{t:"Laptop closed at 5PM",tag:"mama"},{t:"Fully present evening",tag:"soul"},{t:"Make the evening feel good: music, good food, connected time",tag:"soul"}]},{id:"night",cls:"bnight",time:"8:30 – 11:00",win:"win-night",wl:"Window 3 · Night",name:"Edit + Repurpose",tag:"One video. Four assets. Zero extra work.",astro:"Sag Moon sees connections fast — one piece of content becomes omnipresence.",fam:"<strong>Repurpose machine:</strong> From 1 YouTube video extract: 1 IG Reel, 1 Carousel, 1 Quote graphic, 1 Community post.",skill:"<strong>Content checklist:</strong> Reel clipped → Carousel drafted → Quote graphic pulled → Thumbnail created → Posts scheduled.",tasks:[{t:"Clip 1 IG Reel from this week's recording",tag:"vis"},{t:"Draft 1 Carousel from your 3 teaching points",tag:"vis"},{t:"Pull 1 Quote graphic",tag:"vis"},{t:"Write 1 Community post for CyberSecure Hub",tag:"cyber"},{t:"Schedule all assets",tag:"vis"},{t:"Prep tomorrow's YouTube publish checklist",tag:"night"}]},{id:"spouse",cls:"bspouse",time:"11:00 PM +",win:"win-spouse",wl:"Spouse Home · Wind Down",name:"Let It Land",tag:"Do not start new ideas tonight.",astro:"Sag Moon will want to start three new ideas — resist it. New ideas get a voice memo, not a new project folder.",fam:"<strong>Spouse home:</strong> Decompress together. Then sleep deeply.",skill:null,tasks:[{t:"No new content ideas tonight — voice memo if needed",tag:"soul"},{t:"Something beautiful: a show, music, real conversation",tag:"soul"},{t:"Sleep well. What you built today is already working.",tag:"soul"}]}]},skill:{barCls:'skill-bar',bar:"<strong>Skill Day — this is an investment, not a distraction:</strong> TryHackMe, home lab builds, and training courses are the credential behind your coaching, the freshness behind CyberSecure Hub, and the authority behind every offer.",mantra:'"The Leo who keeps sharpening her edge<br><em style=\'font-style:italic\'>never has to justify her rates.</em>"',blocks:[{id:"ceo",cls:"bceo",time:"10:00 – 11:00",win:"win-soft",wl:"Light Touch",name:"Soft CEO",tag:"Revenue check-in. Then go learn.",astro:"Leo Sun needs a quick win before diving deep — a fast scan gives your ego the green light.",fam:"<strong>Morning window:</strong> Get toddler settled, 45-minute business scan, then skill mode.",skill:null,tasks:[{t:"Check for urgent client messages — 30 min max",tag:"ceo"},{t:"Confirm VIP Design Day logistics",tag:"vip"},{t:"Set your skill intention — which module, lab, or concept today?",tag:"skill"}]},{id:"learn1",cls:"bskill",time:"11:00 – 1:00",win:"win-skill",wl:"Skill Block 1 · Morning",name:"Deep Learning Block",tag:"TryHackMe, training course, or concept deep dive.",astro:"Leo Sun with Sag Moon is a powerhouse learner — you learn fast. Always start by asking: what does mastering this let me DO?",fam:"<strong>Toddler window:</strong> Set them up before you start. 90-minute lab blocks are your sweet spot.",skill:"<strong>Skill block options:</strong> TryHackMe room, training course module, or home lab task. Log progress — these become Hub content.",tasks:[{t:"Complete one TryHackMe room — log findings",tag:"skill"},{t:"Or: complete one training course module with notes",tag:"skill"},{t:"Or: work a home lab task — document what you built",tag:"skill"},{t:"Note anything that could become a teaching moment",tag:"cyber"}]},{id:"quiet",cls:"bquiet",time:"1:00 – 2:30",win:"win-baby",wl:"Toddler First · Brain Break",name:"Quiet Time + Reset",tag:"Rest your brain between blocks.",astro:"Sag Moon needs movement between intense focus blocks — a walk resets your fire energy fast.",fam:"<strong>Quiet time on skill days:</strong> Step away from screens, eat something real.",skill:null,tasks:[{t:"Set up toddler's quiet time",tag:"mama"},{t:"Step away from screens — eat, walk, or just sit",tag:"soul"},{t:"Journal or voice memo: what did the morning block teach you?",tag:"skill"}]},{id:"learn2",cls:"bskill",time:"2:30 – 5:00",win:"win-kids",wl:"Skill Block 2 · Afternoon",name:"Applied Skill Block",tag:"Older kids on deck. Go deeper.",astro:"Sag Moon afternoon is expansive — tackle the bigger, more ambitious lab scenarios.",fam:"<strong>Afternoon handoff:</strong> Older kids cover the toddler for the second skill block.",skill:"<strong>Applied focus:</strong> Home lab builds, harder TryHackMe rooms, or a second course module.",tasks:[{t:"Home lab build or advanced TryHackMe scenario",tag:"skill"},{t:"Or: complete a second training module",tag:"skill"},{t:"Document what you built — this becomes Hub material",tag:"cyber"},{t:"Update your skill progress log",tag:"skill"}]},{id:"family",cls:"bclose",time:"5:00 – 8:30",win:"win-baby",wl:"Family Time",name:"Full Family Evening",tag:"Brain off. Presence on.",astro:"Sag Moon can feel restless after a full skill day — let family time be the outlet.",fam:"<strong>Skill days can feel isolating:</strong> Dinner together, connection, easy bedtime.",skill:null,tasks:[{t:"Close all learning tabs at 5PM",tag:"mama"},{t:"Dinner together — talk about something unrelated to tech",tag:"soul"},{t:"Easy bedtime — skill days are mentally tiring",tag:"mama"}]},{id:"night",cls:"bnight",time:"8:30 – 10:30",win:"win-night",wl:"Night Session · Skill to Content",name:"Skill to Content Bridge",tag:"Turn what you learned into tomorrow's income.",astro:"Sag Moon sees connections between big ideas fast — ask: how does what I learned fit into CyberSecure Hub?",fam:"<strong>Night session on skill days:</strong> Translate the day's learning into content or course updates.",skill:"<strong>Content bridge:</strong> Write 2–3 content ideas from today's learning. Update a Hub resource if something new clicked.",tasks:[{t:"Write 2–3 content ideas inspired by today's learning",tag:"vis"},{t:"Update a CyberSecure Hub resource or course module",tag:"cyber"},{t:"Add a new insight to your coaching talking points",tag:"cyber"},{t:"Post one piece of authority content from today's skill work",tag:"vis"}]},{id:"spouse",cls:"bspouse",time:"10:30 PM +",win:"win-spouse",wl:"Spouse Home · Full Rest",name:"Full Rest Mode",tag:"Skill days are mentally expensive. Sleep is part of the ROI.",astro:"Sag Moon wants to stay up talking about everything you learned — keep it brief. Sleep turns new knowledge into mastery.",fam:"<strong>Spouse home:</strong> Short decompression, then sleep.",skill:null,tasks:[{t:"Brief decompression with spouse — then actually sleep",tag:"soul"},{t:"No scrolling after spouse gets home",tag:"soul"},{t:"Tomorrow the skill pays off. Sleep is how.",tag:"soul"}]}]},rest:{barCls:'',bar:"<strong>Rest Day — still a whole mama, still a whole person:</strong> No business pressure today. Your night session is available if you feel genuinely called — but it is optional, never required.",mantra:'"The Leo who rests on purpose<br><em style=\'font-style:italic\'>returns to the stage unstoppable.</em>"',blocks:[{id:"soft",cls:"bceo",time:"Whenever you wake",win:"win-soft",wl:"Light Touch",name:"Soft CEO",tag:"One hour max. Then you are off the clock.",astro:"Sag Moon doesn't always know when to stop — rest days need a hard fence. One intentional scan, then off the clock.",fam:"<strong>Morning ease:</strong> 30-min check from wherever you are. Then genuinely done.",skill:null,tasks:[{t:"Check for urgent client messages only — 30-min timer",tag:"ceo"},{t:"Confirm scheduled content is going out",tag:"vis"},{t:"Voice memo any ideas that surface — capture, do not act",tag:"soul"}]},{id:"child",cls:"bquiet",time:"Morning",win:"win-baby",wl:"Toddler Led",name:"Child-Led Morning",tag:"Let them set the pace. You follow.",astro:"Libra Rising recharges through ease, beauty, and genuine connection.",fam:"<strong>Rest day mama mode:</strong> Park, sensory play, art together, slow lunch.",skill:null,tasks:[{t:"Get outside if possible",tag:"mama"},{t:"Something slow and tactile together",tag:"mama"},{t:"Phone away for at least a 2-hour stretch",tag:"soul"}]},{id:"kids",cls:"bkids",time:"Afternoon",win:"win-solo",wl:"You Time",name:"Receive Mode",tag:"Take real space.",astro:"Leo Sun plus Libra Rising manifests through feeling like HER. Time in your power is strategy.",fam:"<strong>Ask the village:</strong> 90 minutes completely alone. Bath, walk, coffee shop, a drive with music.",skill:null,tasks:[{t:"Older kids or partner covers toddler — you take 90 min alone",tag:"mama"},{t:"Review your $5K tracker — feel how close you are",tag:"ceo"},{t:"Be somewhere that makes you feel like the woman you are becoming",tag:"soul"},{t:"Read, walk, or create with zero monetization attached",tag:"soul"}]},{id:"family",cls:"bclose",time:"5:00 – 8:30",win:"win-baby",wl:"Family Time",name:"Full Family Evening",tag:"Everyone together. Slow and present.",astro:"Sag Moon restores through joy. Make rest look like something that lights you up.",fam:null,skill:null,tasks:[{t:"Dinner together — no phones at the table",tag:"soul"},{t:"Easy bedtime routine",tag:"mama"},{t:"Notice how a slower day feels in your body",tag:"soul"}]},{id:"night",cls:"bnight",time:"8:30 – 10:00",win:"win-night",wl:"Optional Night Session",name:"Optional Wind-Down",tag:"Only if it feels genuinely good.",astro:"Sag Moon sometimes gets a burst of inspiration on rest days — voice memo it. The burst signals your battery is recharged.",fam:"<strong>Optional only:</strong> If you feel called to sit quietly and work or study, do it. If you need the sleep, take it.",skill:"<strong>Optional skill night:</strong> A light TryHackMe room or a single training video counts.",tasks:[{t:"Prep tomorrow's top 3 tasks — 5 minutes, then close it",tag:"ceo"},{t:"Optional: one quiet skill session",tag:"skill"},{t:"Optional: journal what this rest day gave you",tag:"soul"}]},{id:"spouse",cls:"bspouse",time:"Spouse home +",win:"win-spouse",wl:"Spouse Home · Full Rest",name:"Full Restore",tag:"Tomorrow you push again. Tonight you sleep fully.",astro:"Rest days are what keep the optimism from curdling into burnout. Rest isn't the opposite of the vision — it's what keeps it alive.",fam:"<strong>Spouse home:</strong> Connect, decompress, let the day fully close.",skill:null,tasks:[{t:"No business or skill planning tonight",tag:"soul"},{t:"Sleep well. The $5K goal and your whole family will both be there in the morning.",tag:"soul"}]}]}};
+var currentDay='push',checked={};
+function setDay(type,btn){currentDay=type;document.querySelectorAll('.day-btn').forEach(function(b){b.classList.remove('active','skill-active');});btn.classList.add('active');if(type==='skill')btn.classList.add('skill-active');renderBlocks();try{saveState();showSaved();}catch(e){}}
+function renderBlocks(){var data=D[currentDay];var fb=document.getElementById('family-bar');fb.innerHTML=data.bar;fb.className='family-bar'+(data.barCls?' '+data.barCls:'');document.getElementById('mantra-text').innerHTML=data.mantra;var container=document.getElementById('blocks');container.innerHTML='';data.blocks.forEach(function(block,i){var div=document.createElement('div');div.className='theme-block '+block.cls;div.id='blk-'+block.id;if(i===0)div.classList.add('open');var tasks=block.tasks.map(function(t,ti){var key=currentDay+'-'+block.id+'-'+ti;var done=checked[key]?'done':'';var chk=done?'&#10003;':'';return '<div class="task '+done+'" onclick="toggleTask(\''+key+'\',this)"><div class="task-check">'+chk+'</div><div class="task-text">'+t.t+'</div><span class="task-tag tag-'+t.tag+'">'+t.tag+'</span></div>';}).join('');var notes='<div class="block-divider"></div><div class="note-block note-astro">'+block.astro+'</div>';if(block.fam)notes+='<div class="note-block note-fam">&#127968;&nbsp; '+block.fam+'</div>';if(block.skill)notes+='<div class="note-block note-skill">&#128737;&nbsp; '+block.skill+'</div>';div.innerHTML='<div class="block-header" onclick="toggleBlock(\''+block.id+'\')"><div class="block-time">'+block.time+'<br><span class="win-tag '+block.win+'">'+block.wl+'</span></div><div class="block-label"><div class="theme-name">'+block.name+'</div><div class="theme-tag">'+block.tag+'</div></div><div class="block-caret">&#9662;</div></div><div class="block-body"><div class="block-inner"><div class="task-list">'+tasks+'</div>'+notes+'</div></div>';container.appendChild(div);});updateProgress();}
+function toggleBlock(id){document.getElementById('blk-'+id).classList.toggle('open');}
+function toggleTask(key,el){checked[key]=!checked[key];el.classList.toggle('done');el.querySelector('.task-check').innerHTML=checked[key]?'&#10003;':'';updateProgress();try{saveState();showSaved();}catch(e){}}
+function updateProgress(){var data=D[currentDay],total=0,done=0;data.blocks.forEach(function(block){block.tasks.forEach(function(t,ti){total++;if(checked[currentDay+'-'+block.id+'-'+ti])done++;});});var pct=total?Math.round(done/total*100):0;document.getElementById('progress-text').textContent=done+' / '+total+' complete';document.getElementById('progress-fill').style.width=pct+'%';}
+function resetDay(){D[currentDay].blocks.forEach(function(block){block.tasks.forEach(function(t,ti){checked[currentDay+'-'+block.id+'-'+ti]=false;});});renderBlocks();try{saveState();}catch(e){}}
+function switchView(view,btn){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+view).classList.add('active');btn.classList.add('active');if(view==='weekly')renderWeekGrid();if(view==='income')renderIncome();}
+var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var SESSION_NOTES={push:{morning:'CEO + VIP outreach',afternoon:'Deliver + close',night:'Deep work + skill bonus'},create:{morning:'CEO + content batch',afternoon:'Design + build',night:'Edit + repurpose'},skill:{morning:'Soft CEO + lab setup',afternoon:'Deep lab / home build',night:'Skill → content bridge'},rest:{morning:'Soft CEO (30 min)',afternoon:'Family + receive mode',night:'Optional only'}};
+var weekPlan=['push','create','push','skill','push','create','rest'];
+var selectedType='push';
+var sessionPrefs={morning:true,afternoon:true,night:true};
+function selectType(type,el){selectedType=type;document.querySelectorAll('.dtype-pill').forEach(function(p){p.classList.remove('selected');});el.classList.add('selected');}
+function updateSessionPrefs(){var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');sessionPrefs.morning=cbs[0].checked;sessionPrefs.afternoon=cbs[1].checked;sessionPrefs.night=cbs[2].checked;var count=[sessionPrefs.morning,sessionPrefs.afternoon,sessionPrefs.night].filter(Boolean).length;document.getElementById('session-badge').textContent=count+' session'+(count!==1?'s':'')+' active';renderWeekGrid();try{saveState();}catch(e){}}
+function applyTemplate(tpl){var t={balanced:['push','create','push','skill','push','create','rest'],heavy:['push','push','create','push','skill','push','rest'],creative:['create','push','create','skill','create','rest','rest'],skillweek:['push','skill','create','skill','push','rest','skill'],contentweek:['push','push','create','push','push','rest','rest'],clear:[null,null,null,null,null,null,null]};weekPlan=t[tpl].slice();renderWeekGrid();try{saveState();}catch(e){}}
+function assignDay(i){weekPlan[i]=(weekPlan[i]===selectedType)?null:selectedType;renderWeekGrid();try{saveState();showSaved();}catch(e){}}
+function renderWeekGrid(){var grid=document.getElementById('week-grid');if(!grid)return;var today=new Date();var todayDow=(today.getDay()+6)%7;var monday=new Date(today);monday.setDate(today.getDate()-todayDow);grid.innerHTML='';DAYS.forEach(function(day,i){var cellDate=new Date(monday);cellDate.setDate(monday.getDate()+i);var isToday=(i===todayDow);var type=weekPlan[i];var typeLabel=type?type.charAt(0).toUpperCase()+type.slice(1)+' Day':'Tap to set';var typeCls=type?'t-'+type:'t-empty';var dateStr=(cellDate.getMonth()+1)+'/'+cellDate.getDate();var pipsHtml='';if(type){var notes=SESSION_NOTES[type];var isSkill=type==='skill';if(sessionPrefs.morning)pipsHtml+='<div class="session-pip pip-morning'+(isSkill?' pip-skill':'')+'">'+notes.morning+'</div>';if(sessionPrefs.afternoon)pipsHtml+='<div class="session-pip pip-afternoon'+(isSkill?' pip-skill':'')+'">'+notes.afternoon+'</div>';if(sessionPrefs.night)pipsHtml+='<div class="session-pip pip-night'+(isSkill?' pip-skill':'')+'">'+notes.night+'</div>';}var cell=document.createElement('div');cell.className='day-cell'+(isToday?' is-today':'');cell.onclick=(function(idx){return function(){assignDay(idx);};})(i);cell.innerHTML='<div class="day-cell-header"><div class="day-name">'+day+'</div><div class="day-date">'+dateStr+(isToday?' · today':'')+'</div></div><div class="day-cell-body"><div class="dct '+typeCls+'">'+typeLabel+'</div>'+(pipsHtml?'<div class="day-sessions">'+pipsHtml+'</div>':'')+'</div>';grid.appendChild(cell);});updateWeekSummary();}
+function updateWeekSummary(){var counts={push:0,create:0,skill:0,rest:0};weekPlan.forEach(function(t){if(t)counts[t]++;});document.getElementById('sum-push').textContent=counts.push;document.getElementById('sum-create').textContent=counts.create;document.getElementById('sum-skill').textContent=counts.skill;document.getElementById('sum-rest').textContent=counts.rest;var si=document.getElementById('skill-insight');if(counts.skill>=1){var skillDays=[];weekPlan.forEach(function(t,i){if(t==='skill')skillDays.push(DAYS[i]);});si.innerHTML='&#128737; <strong>Skill days this week: '+skillDays.join(', ')+'.</strong> What you learn on skill days becomes content, course material, and coaching depth.';si.classList.remove('hidden');}else{si.classList.add('hidden');}var advisory=document.getElementById('week-advisory');var msg='';if(counts.push>=4&&counts.rest===0){msg='&#9888; <strong>Sag Moon alert:</strong> No rest days planned. Add at least one rest day.';}else if(counts.rest>=3){msg='&#9836; <strong>Leo Sun check:</strong> Three or more rest days is a lot for your energy type.';}else if(counts.skill===0&&counts.push>=3){msg='&#128737; <strong>Skill gap:</strong> No Skill Day planned this week. Even one skill day keeps the edge sharp.';}else if(counts.push>=2&&counts.skill>=1&&counts.rest>=1){msg='&#10024; <strong>Astro-aligned week:</strong> Push days for revenue, skill day for authority, rest day to keep Sag Moon\u2019s fire burning.';}else if(counts.push===0){msg='&#9836; <strong>Leo Sun needs movement:</strong> No push days means no revenue conversations this week.';}else if(counts.skill>=3){msg='&#128737; <strong>Skill-heavy week:</strong> Make sure push days are still covering revenue conversations.';}advisory.innerHTML=msg;advisory.style.display=msg?'block':'none';}
+var recallChecked={};
+function toggleFs(id){var el=document.getElementById('fs-'+id);if(el)el.classList.toggle('open');}
+function toggleC5(idx){var el=document.getElementById('c5-'+idx);if(el)el.classList.toggle('open');}
+function toggleRecall(key,el){recallChecked[key]=!recallChecked[key];el.classList.toggle('done');el.querySelector('.recall-check').innerHTML=recallChecked[key]?'&#10003;':'';updateRecallProgress();saveState();}
+function updateRecallProgress(){var allItems=document.querySelectorAll('#view-fortress .recall-item');var total=allItems.length,done=0;allItems.forEach(function(item){if(item.classList.contains('done'))done++;});var pct=total?Math.round(done/total*100):0;var pt=document.getElementById('recall-progress-text');var rf=document.getElementById('recall-fill');if(pt)pt.textContent=done+' / '+total+' complete';if(rf)rf.style.width=pct+'%';}
+var STORAGE_KEY='kenyatta_dailyflow_v4';
+var DAILY_RESET_KEY='kenyatta_last_reset';
+var WEEKLY_RESET_KEY='kenyatta_last_week';
+function getMondayStr(){var today=new Date();var dow=(today.getDay()+6)%7;var mon=new Date(today);mon.setDate(today.getDate()-dow);return mon.getFullYear()+'-'+(mon.getMonth()+1)+'-'+mon.getDate();}
+function getTodayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function saveState(){try{var weekNote=document.getElementById('week-notes');var state={currentDay:currentDay,checked:checked,recallChecked:recallChecked,weekPlan:weekPlan,sessionPrefs:sessionPrefs,weekNote:weekNote?weekNote.value:'',savedDate:getTodayStr(),savedWeek:getMondayStr()};localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}}
+function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;var state=JSON.parse(raw);var todayStr=getTodayStr();var thisWeek=getMondayStr();if(state.savedDate!==todayStr){checked={};recallChecked={};}else{checked=state.checked||{};recallChecked=state.recallChecked||{};}if(state.savedWeek!==thisWeek){weekPlan=['push','create','push','skill','push','create','rest'];}else{weekPlan=state.weekPlan||weekPlan;}currentDay=state.currentDay||'push';sessionPrefs=state.sessionPrefs||sessionPrefs;document.querySelectorAll('.day-btn').forEach(function(b){b.classList.remove('active','skill-active');});var dayBtns=document.querySelectorAll('.day-btn');var dayMap={push:0,create:1,skill:2,rest:3};if(dayMap[currentDay]!==undefined&&dayBtns[dayMap[currentDay]]){dayBtns[dayMap[currentDay]].classList.add('active');if(currentDay==='skill')dayBtns[dayMap[currentDay]].classList.add('skill-active');}var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');if(cbs[0])cbs[0].checked=sessionPrefs.morning!==false;if(cbs[1])cbs[1].checked=sessionPrefs.afternoon!==false;if(cbs[2])cbs[2].checked=sessionPrefs.night!==false;if(state.weekNote){var wn=document.getElementById('week-notes');if(wn)wn.value=state.weekNote;}}catch(e){}}
+function restoreRecallUI(){Object.keys(recallChecked).forEach(function(key){if(!recallChecked[key])return;var items=document.querySelectorAll('#view-fortress .recall-item');items.forEach(function(item){var oc=item.getAttribute('onclick')||'';if(oc.indexOf("'"+key+"'")!==-1||oc.indexOf('"'+key+'"')!==-1){item.classList.add('done');var chk=item.querySelector('.recall-check');if(chk)chk.innerHTML='&#10003;';}});});updateRecallProgress();}
+var wnEl=document.getElementById('week-notes');if(wnEl)wnEl.addEventListener('input',saveState);
+var INCOME_KEY='kenyatta_income_v1';
+var GOAL=5000;
+var incomeData={};
+var viewingMonth=new Date();viewingMonth.setDate(1);
+var streamLabels={vip:'VIP Design Day',digital:'Digital Product',coaching:'1:1 Coaching',hub:'Hub Membership',acuity:'Acuity Setup',website:'Website in a Week'};
+var streamDefaults={vip:'VIP Design Day',digital:'Digital Product Sale',coaching:'Cybersecurity 1:1 Coaching',hub:'CyberSecure Hub Member',acuity:'Acuity Beauty Setup',website:'Website in a Week'};
+var streamCounts={vip:'booking',digital:'sale',coaching:'client',hub:'member',acuity:'setup',website:'project'};
+function getMonthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function getMonthLabel(d){var months=['January','February','March','April','May','June','July','August','September','October','November','December'];return months[d.getMonth()]+' '+d.getFullYear();}
+function loadIncome(){try{var raw=localStorage.getItem(INCOME_KEY);if(raw)incomeData=JSON.parse(raw);}catch(e){}}
+function saveIncome(){try{localStorage.setItem(INCOME_KEY,JSON.stringify(incomeData));showSaved();}catch(e){}}
+function prevMonth(){viewingMonth.setMonth(viewingMonth.getMonth()-1);renderIncome();}
+function nextMonth(){var now=new Date();now.setDate(1);var next=new Date(viewingMonth);next.setMonth(next.getMonth()+1);if(next<=now){viewingMonth.setMonth(viewingMonth.getMonth()+1);}renderIncome();}
+function handleStreamChange(){var stream=document.getElementById('log-stream').value;document.getElementById('tier-row-vip').style.display=stream==='vip'?'block':'none';document.getElementById('tier-row-acuity').style.display=stream==='acuity'?'block':'none';document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.remove('selected');});}
+function selectTier(amount,btn){document.getElementById('log-amount').value=amount;document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');}
+function logPayment(){var stream=document.getElementById('log-stream').value;var amount=parseFloat(document.getElementById('log-amount').value);var desc=document.getElementById('log-desc').value.trim();if(!amount||amount<=0){alert('Please enter a valid amount.');return;}if(!desc)desc=streamDefaults[stream]||stream;var key=getMonthKey(viewingMonth);if(!incomeData[key])incomeData[key]=[];var entry={id:Date.now(),stream:stream,amount:amount,desc:desc,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})};incomeData[key].unshift(entry);saveIncome();document.getElementById('log-amount').value='';document.getElementById('log-desc').value='';document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.remove('selected');});renderIncome();}
+function deleteEntry(monthKey,id){if(!incomeData[monthKey])return;incomeData[monthKey]=incomeData[monthKey].filter(function(e){return e.id!==id;});if(incomeData[monthKey].length===0)delete incomeData[monthKey];saveIncome();renderIncome();}
+function getMonthTotal(key){if(!incomeData[key])return 0;return incomeData[key].reduce(function(sum,e){return sum+e.amount;},0);}
+function getStreamTotal(key,stream){if(!incomeData[key])return 0;return incomeData[key].filter(function(e){return e.stream===stream;}).reduce(function(sum,e){return sum+e.amount;},0);}
+function getStreamCount(key,stream){if(!incomeData[key])return 0;return incomeData[key].filter(function(e){return e.stream===stream;}).length;}
+function fmtMoney(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function renderIncome(){var key=getMonthKey(viewingMonth);var total=getMonthTotal(key);var pct=Math.min(100,Math.round((total/GOAL)*100));var remaining=Math.max(0,GOAL-total);document.getElementById('month-label').textContent=getMonthLabel(viewingMonth);document.getElementById('log-month-label').textContent=getMonthLabel(viewingMonth);var circumference=351.86;var offset=circumference-(pct/100)*circumference;var ringEl=document.getElementById('ring-fill');if(ringEl)ringEl.style.strokeDashoffset=offset;document.getElementById('ring-pct').textContent=pct+'%';document.getElementById('stat-total').textContent=fmtMoney(total);document.getElementById('stat-remaining').textContent=remaining>0?fmtMoney(remaining)+' to go':'🎉 Goal reached!';document.getElementById('stat-count').textContent=(incomeData[key]||[]).length;
+var streams=['vip','dig','coaching','hub','acuity','website'];
+var streamKeys={vip:'vip',dig:'digital',coaching:'coaching',hub:'hub',acuity:'acuity',website:'website'};
+var suffixMap={vip:'bookings',dig:'sales',coaching:'clients',hub:'members',acuity:'setups',website:'projects'};
+['vip','dig','coaching','hub','acuity','website'].forEach(function(s){var sk=streamKeys[s];var t=getStreamTotal(key,sk);var c=getStreamCount(key,sk);var sfx=suffixMap[s];document.getElementById('stream-'+s+'-amt').textContent=fmtMoney(t);document.getElementById('stream-'+s+'-count').textContent=c+' '+sfx;document.getElementById('stream-'+s+'-bar').style.width=total>0?Math.round((t/GOAL)*100)+'%':'0%';});
+var listEl=document.getElementById('log-list');var entries=incomeData[key]||[];if(entries.length===0){listEl.innerHTML='<div class="log-empty">No payments logged yet this month.<br>Every booking starts here. \ud83e\udd81</div>';}else{listEl.innerHTML=entries.map(function(e){return '<div class="log-entry"><div class="log-entry-dot '+e.stream+'"></div><div class="log-entry-info"><div class="log-entry-desc">'+e.desc+'</div><div class="log-entry-date">'+e.date+' \u00b7 '+(streamLabels[e.stream]||e.stream)+'</div></div><div class="log-entry-amount">'+fmtMoney(e.amount)+'</div><button class="log-entry-del" onclick="deleteEntry(\''+key+'\','+e.id+')" title="Delete">\u00d7</button></div>';}).join('');}renderHistory();}
+function renderHistory(){var currentKey=getMonthKey(viewingMonth);var keys=Object.keys(incomeData).filter(function(k){return k!==currentKey;}).sort(function(a,b){return b.localeCompare(a);});var histEl=document.getElementById('history-list');if(keys.length===0){histEl.innerHTML='<div class="log-empty" style="padding:16px;">No past months recorded yet.</div>';return;}histEl.innerHTML=keys.map(function(k){var parts=k.split('-');var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,1);var monthTotal=getMonthTotal(k);var pct=Math.min(100,Math.round((monthTotal/GOAL)*100));return '<div class="history-month"><div class="history-month-label">'+getMonthLabel(d)+'</div><div class="history-month-pct">'+pct+'%</div><div class="history-month-total">'+fmtMoney(monthTotal)+'</div></div><div class="history-month-bar"><div class="history-month-fill" style="width:'+pct+'%"></div></div>';}).join('');}
+function toggleHistory(){var toggle=document.getElementById('history-toggle');var body=document.getElementById('history-body');toggle.classList.toggle('open');body.classList.toggle('open');}
+try{loadState();}catch(e){}
+renderBlocks();
+try{restoreRecallUI();}catch(e){}
+function showSaved(){var el=document.getElementById('save-indicator');if(!el)return;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';},1200);}
+loadIncome();
+</script>
+<div id="save-indicator" style="position:fixed;bottom:20px;right:20px;z-index:999;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:1px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,0.7);opacity:0;transition:opacity .4s ease;pointer-events:none;">✦ saved</div>
+</body>
+</html>
