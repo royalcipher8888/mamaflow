@@ -471,6 +471,27 @@ body::after {
 @keyframes checkPulse{0%{box-shadow:0 0 0 rgba(201,168,76,0)}40%{box-shadow:0 0 8px rgba(201,168,76,0.45)}100%{box-shadow:0 0 4px rgba(201,168,76,0.18)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){
+  .nav-tabs{max-width:100%;margin-bottom:32px;}
+  .nav-tab{padding:14px 4px;font-size:8px;}
+  .day-toggle{display:grid;grid-template-columns:1fr 1fr;max-width:100%;}
+  .day-btn{padding:14px 8px;}
+  .block-header{padding:20px 16px!important;min-height:64px;}
+  .block-inner{padding:0 16px 20px!important;}
+  .block-time{min-width:90px;}
+  .week-grid{grid-template-columns:repeat(4,1fr);}
+  .astro-callout-inner{gap:12px;}
+  .astro-moon-sign{font-size:18px;}
+  .income-top{grid-template-columns:1fr;}
+  .goal-ring-wrap{grid-column:1;}
+  .income-stats{grid-column:1;}
+  .stream-grid{grid-template-columns:1fr 1fr!important;}
+}
+@media(max-width:480px){
+  .week-grid{grid-template-columns:repeat(2,1fr);}
+  .stream-grid{grid-template-columns:1fr!important;}
+  .header h1{font-size:clamp(36px,12vw,88px);}
+}
 </style>
 </head>
 <body>
