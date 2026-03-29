@@ -306,7 +306,14 @@ body.light-mode .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,
 .week-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:22px;animation:fadeDown .8s .16s ease both;}
 .wscard{background:linear-gradient(160deg,rgba(255,255,255,0.04),rgba(14,11,7,0.6));border:1px solid rgba(255,255,255,.06);border-top:2px solid rgba(201,168,76,0.20);border-radius:12px;padding:18px 14px;text-align:center;transition:all .2s;}
 /* ── History Calendar ── */
-.week-hist-cal{background:linear-gradient(160deg,rgba(255,255,255,0.03),rgba(14,11,7,0.5));border:1px solid rgba(255,255,255,0.06);border-top:2px solid rgba(201,168,76,0.18);border-radius:14px;padding:20px;margin-bottom:18px;}
+.daily-hist-cal{background:linear-gradient(160deg,rgba(255,255,255,0.03),rgba(14,11,7,0.5));border:1px solid rgba(255,255,255,0.06);border-top:2px solid rgba(201,168,76,0.18);border-radius:10px;padding:10px 12px;margin-bottom:14px;width:fit-content;}
+.daily-hist-cal .whc-nav{margin-bottom:7px;}
+.daily-hist-cal .whc-month{font-size:7px;letter-spacing:.18em;}
+.daily-hist-cal .whc-arrow{font-size:11px;padding:1px 7px;border-radius:5px;}
+.daily-hist-cal .whc-dow-row{gap:2px;margin-bottom:3px;}
+.daily-hist-cal .whc-dow-row span{font-size:6px;}
+.daily-hist-cal .whc-grid{gap:2px;}
+.daily-hist-cal .whc-day{font-size:7px;border-radius:4px;}
 .whc-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .whc-month{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);}
 .whc-arrow{background:none;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--muted2);font-size:15px;padding:3px 10px;cursor:pointer;transition:border-color .2s,color .2s;}
@@ -724,6 +731,15 @@ body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76
   <button class="day-btn" onclick="setDay('skill',this)">🛡 Skill Day</button>
   <button class="day-btn" onclick="setDay('rest',this)">🌿 Rest Day</button>
 </div>
+<div class="daily-hist-cal" id="week-hist-cal">
+  <div class="whc-nav">
+    <button class="whc-arrow" onclick="wcalShift(-1)">‹</button>
+    <span class="whc-month" id="whc-month-label"></span>
+    <button class="whc-arrow" onclick="wcalShift(1)">›</button>
+  </div>
+  <div class="whc-dow-row"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+  <div class="whc-grid" id="whc-grid"></div>
+</div>
 <div class="family-bar" id="family-bar"></div>
 <div class="progress-wrap">
   <div class="progress-label"><span>Daily Progress</span><span id="progress-text">0 / 0 complete</span></div>
@@ -743,15 +759,6 @@ body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76
 <!-- ══ WEEKLY VIEW ══ -->
 <div class="view active" id="view-weekly">
 <div class="week-header"><h2>Weekly <em>Rhythm</em></h2><p>Set your intention · plan the week · flow into each day</p></div>
-<div class="week-hist-cal" id="week-hist-cal">
-  <div class="whc-nav">
-    <button class="whc-arrow" onclick="wcalShift(-1)">‹</button>
-    <span class="whc-month" id="whc-month-label"></span>
-    <button class="whc-arrow" onclick="wcalShift(1)">›</button>
-  </div>
-  <div class="whc-dow-row"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-  <div class="whc-grid" id="whc-grid"></div>
-</div>
 <div class="week-intention-box">
   <div class="week-intention-label">This Week's Intention</div>
   <textarea class="week-notes-input" id="week-notes" placeholder="Revenue goal · VIP bookings · skill module · content theme · $5K milestone..."></textarea>
@@ -1094,7 +1101,7 @@ function toggleBlock(id){document.getElementById('blk-'+id).classList.toggle('op
 function toggleTask(key,el){checked[key]=!checked[key];el.classList.toggle('done');el.querySelector('.task-check').innerHTML=checked[key]?'&#10003;':'';updateProgress();try{saveState();showSaved();}catch(e){}}
 function updateProgress(){var data=D[currentDay],total=0,done=0;data.blocks.forEach(function(block){block.tasks.forEach(function(t,ti){total++;if(checked[currentDay+'-'+block.id+'-'+ti])done++;});});var pct=total?Math.round(done/total*100):0;document.getElementById('progress-text').textContent=done+' / '+total+' complete';document.getElementById('progress-fill').style.width=pct+'%';}
 function resetDay(){D[currentDay].blocks.forEach(function(block){block.tasks.forEach(function(t,ti){checked[currentDay+'-'+block.id+'-'+ti]=false;});});renderBlocks();try{saveState();}catch(e){}}
-function switchView(view,btn){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+view).classList.add('active');btn.classList.add('active');if(view==='weekly')renderWeekGrid();if(view==='income')renderIncome();}
+function switchView(view,btn){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+view).classList.add('active');btn.classList.add('active');if(view==='weekly')renderWeekGrid();if(view==='income')renderIncome();if(view==='daily')renderWCal();}
 var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESSION_NOTES={push:{morning:'CEO + VIP outreach',afternoon:'Deliver + close',night:'Deep work + skill bonus'},create:{morning:'CEO + content batch',afternoon:'Design + build',night:'Edit + repurpose'},skill:{morning:'Soft CEO + lab setup',afternoon:'Deep lab / home build',night:'Skill → content bridge'},rest:{morning:'Soft CEO (30 min)',afternoon:'Family + receive mode',night:'Optional only'}};
 var weekPlan=['push','create','push','skill','push','create','rest'];
@@ -1104,7 +1111,7 @@ function selectType(type,el){selectedType=type;document.querySelectorAll('.dtype
 function updateSessionPrefs(){var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');sessionPrefs.morning=cbs[0].checked;sessionPrefs.afternoon=cbs[1].checked;sessionPrefs.night=cbs[2].checked;var count=[sessionPrefs.morning,sessionPrefs.afternoon,sessionPrefs.night].filter(Boolean).length;document.getElementById('session-badge').textContent=count+' session'+(count!==1?'s':'')+' active';updateDaySessionBar();renderBlocks();renderWeekGrid();try{saveState();}catch(e){}}
 function applyTemplate(tpl){var t={balanced:['push','create','push','skill','push','create','rest'],heavy:['push','push','create','push','skill','push','rest'],creative:['create','push','create','skill','create','rest','rest'],skillweek:['push','skill','create','skill','push','rest','skill'],contentweek:['push','push','create','push','push','rest','rest'],clear:[null,null,null,null,null,null,null]};weekPlan=t[tpl].slice();renderWeekGrid();try{saveState();}catch(e){}}
 function assignDay(i){weekPlan[i]=(weekPlan[i]===selectedType)?null:selectedType;renderWeekGrid();try{saveState();showSaved();}catch(e){}}
-function renderWeekGrid(){renderWCal();var grid=document.getElementById('week-grid');if(!grid)return;var today=new Date();var todayDow=(today.getDay()+6)%7;var monday=new Date(today);monday.setDate(today.getDate()-todayDow);grid.innerHTML='';DAYS.forEach(function(day,i){var cellDate=new Date(monday);cellDate.setDate(monday.getDate()+i);var isToday=(i===todayDow);var type=weekPlan[i];var typeLabel=type?type.charAt(0).toUpperCase()+type.slice(1)+' Day':'Tap to set';var typeCls=type?'t-'+type:'t-empty';var dateStr=(cellDate.getMonth()+1)+'/'+cellDate.getDate();var pipsHtml='';if(type){var notes=SESSION_NOTES[type];var isSkill=type==='skill';if(sessionPrefs.morning)pipsHtml+='<div class="session-pip pip-morning'+(isSkill?' pip-skill':'')+'">'+notes.morning+'</div>';if(sessionPrefs.afternoon)pipsHtml+='<div class="session-pip pip-afternoon'+(isSkill?' pip-skill':'')+'">'+notes.afternoon+'</div>';if(sessionPrefs.night)pipsHtml+='<div class="session-pip pip-night'+(isSkill?' pip-skill':'')+'">'+notes.night+'</div>';}var cell=document.createElement('div');cell.className='day-cell'+(isToday?' is-today':'');cell.onclick=(function(idx){return function(){assignDay(idx);};})(i);cell.innerHTML='<div class="day-cell-header"><div class="day-name">'+day+'</div><div class="day-date">'+dateStr+(isToday?' · today':'')+'</div></div><div class="day-cell-body"><div class="dct '+typeCls+'">'+typeLabel+'</div>'+(pipsHtml?'<div class="day-sessions">'+pipsHtml+'</div>':'')+'</div>';grid.appendChild(cell);});updateWeekSummary();}
+function renderWeekGrid(){var grid=document.getElementById('week-grid');if(!grid)return;var today=new Date();var todayDow=(today.getDay()+6)%7;var monday=new Date(today);monday.setDate(today.getDate()-todayDow);grid.innerHTML='';DAYS.forEach(function(day,i){var cellDate=new Date(monday);cellDate.setDate(monday.getDate()+i);var isToday=(i===todayDow);var type=weekPlan[i];var typeLabel=type?type.charAt(0).toUpperCase()+type.slice(1)+' Day':'Tap to set';var typeCls=type?'t-'+type:'t-empty';var dateStr=(cellDate.getMonth()+1)+'/'+cellDate.getDate();var pipsHtml='';if(type){var notes=SESSION_NOTES[type];var isSkill=type==='skill';if(sessionPrefs.morning)pipsHtml+='<div class="session-pip pip-morning'+(isSkill?' pip-skill':'')+'">'+notes.morning+'</div>';if(sessionPrefs.afternoon)pipsHtml+='<div class="session-pip pip-afternoon'+(isSkill?' pip-skill':'')+'">'+notes.afternoon+'</div>';if(sessionPrefs.night)pipsHtml+='<div class="session-pip pip-night'+(isSkill?' pip-skill':'')+'">'+notes.night+'</div>';}var cell=document.createElement('div');cell.className='day-cell'+(isToday?' is-today':'');cell.onclick=(function(idx){return function(){assignDay(idx);};})(i);cell.innerHTML='<div class="day-cell-header"><div class="day-name">'+day+'</div><div class="day-date">'+dateStr+(isToday?' · today':'')+'</div></div><div class="day-cell-body"><div class="dct '+typeCls+'">'+typeLabel+'</div>'+(pipsHtml?'<div class="day-sessions">'+pipsHtml+'</div>':'')+'</div>';grid.appendChild(cell);});updateWeekSummary();}
 function updateWeekSummary(){var counts={push:0,create:0,skill:0,rest:0};weekPlan.forEach(function(t){if(t)counts[t]++;});document.getElementById('sum-push').textContent=counts.push;document.getElementById('sum-create').textContent=counts.create;document.getElementById('sum-skill').textContent=counts.skill;document.getElementById('sum-rest').textContent=counts.rest;var si=document.getElementById('skill-insight');if(counts.skill>=1){var skillDays=[];weekPlan.forEach(function(t,i){if(t==='skill')skillDays.push(DAYS[i]);});si.innerHTML='&#128737; <strong>Skill days this week: '+skillDays.join(', ')+'.</strong> What you learn on skill days becomes content, course material, and coaching depth.';si.classList.remove('hidden');}else{si.classList.add('hidden');}var advisory=document.getElementById('week-advisory');var msg='';if(counts.push>=4&&counts.rest===0){msg='&#9888; <strong>Sag Moon alert:</strong> No rest days planned. Add at least one rest day.';}else if(counts.rest>=3){msg='&#9836; <strong>Leo Sun check:</strong> Three or more rest days is a lot for your energy type.';}else if(counts.skill===0&&counts.push>=3){msg='&#128737; <strong>Skill gap:</strong> No Skill Day planned this week. Even one skill day keeps the edge sharp.';}else if(counts.push>=2&&counts.skill>=1&&counts.rest>=1){msg='&#10024; <strong>Astro-aligned week:</strong> Push days for revenue, skill day for authority, rest day to keep Sag Moon\u2019s fire burning.';}else if(counts.push===0){msg='&#9836; <strong>Leo Sun needs movement:</strong> No push days means no revenue conversations this week.';}else if(counts.skill>=3){msg='&#128737; <strong>Skill-heavy week:</strong> Make sure push days are still covering revenue conversations.';}advisory.innerHTML=msg;advisory.style.display=msg?'block':'none';}
 var recallChecked={};
 function toggleFs(id){var el=document.getElementById('fs-'+id);if(el)el.classList.toggle('open');}
@@ -1169,7 +1176,7 @@ function openHistModal(ds){
   var body='<div class="hist-pct-bar"><div class="hist-pct-fill" style="width:'+pct+'%"></div></div>';
   body+='<div class="hist-pct-label">'+entry.done+' / '+entry.total+' tasks · '+pct+'% complete</div>';
   if(blocks.length===0){body+='<div class="hist-empty">No task data saved for this day.</div>';}
-  else{blocks.forEach(function(blk,bi){if(!blk.tasks||blk.tasks.length===0)return;body+='<div class="hist-block"><div class="hist-block-title">'+(blk.wl||blk.label||'Block '+(bi+1))+'</div>';blk.tasks.forEach(function(task,ti){var done=entry.checked&&entry.checked[entry.type+'-'+blk.id+'-'+ti];body+='<div class="hist-task'+(done?' done':'')+'"><div class="hist-check">'+(done?'✓':'')+'</div><span>'+task+'</span></div>';});body+='</div>';});}
+  else{blocks.forEach(function(blk,bi){if(!blk.tasks||blk.tasks.length===0)return;body+='<div class="hist-block"><div class="hist-block-title">'+(blk.wl||blk.label||'Block '+(bi+1))+'</div>';blk.tasks.forEach(function(task,ti){var done=entry.checked&&entry.checked[entry.type+'-'+blk.id+'-'+ti];body+='<div class="hist-task'+(done?' done':'')+'"><div class="hist-check">'+(done?'✓':'')+'</div><span>'+(task.t||task)+'</span></div>';});body+='</div>';});}
   document.getElementById('hist-modal-body').innerHTML=body;
   document.getElementById('hist-overlay').classList.add('open');
   document.getElementById('hist-modal').classList.add('open');
@@ -1315,6 +1322,7 @@ function setDayFromAstro(type){
 function toggleTheme(){var isLight=document.body.classList.toggle('light-mode');localStorage.setItem('kenyatta_theme',isLight?'light':'dark');var btn=document.getElementById('theme-toggle');if(btn)btn.innerHTML=isLight?'🌙 Dark':'☀ Light';}
 (function(){var saved=localStorage.getItem('kenyatta_theme');var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches;if(saved==='light'||(saved!=='dark'&&sysLight)){document.body.classList.add('light-mode');var btn=document.getElementById('theme-toggle');if(btn)btn.innerHTML='🌙 Dark';}})();
 try{loadState();}catch(e){}
+try{renderWCal();}catch(e){}
 renderBlocks();
 // Harden day button sync after renderBlocks runs
 (function(){
