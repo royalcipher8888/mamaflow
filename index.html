@@ -678,8 +678,32 @@ body.light-mode .istat{background:linear-gradient(160deg,rgba(201,168,76,0.06),r
 body.light-mode .stream-name,body.light-mode .stream-count,body.light-mode .istat-label,body.light-mode .istat-sub{color:var(--muted);}
 body.light-mode .goal-ring-bg{stroke:rgba(0,0,0,0.07);}
 body.light-mode .fortress-section-header{background:linear-gradient(105deg,rgba(201,168,76,0.12) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .fs-name{color:var(--cream);}
+body.light-mode .fs-caret{border-color:rgba(0,0,0,0.10);color:var(--muted2);}
 body.light-mode .fortress-inner{background:#EDE6D5;}
 body.light-mode .fort-divider{background:linear-gradient(90deg,rgba(0,0,0,0.07),transparent);}
+/* Manifesto */
+body.light-mode .manifesto-statement{color:rgba(42,31,20,0.80);border-color:rgba(201,168,76,0.20);background:rgba(201,168,76,0.05);}
+body.light-mode .manifesto-value{color:rgba(42,31,20,0.75);background:rgba(0,0,0,0.02);}
+body.light-mode .phrase-section-label{color:rgba(42,90,138,0.70);opacity:1;}
+/* Recall / anchor items */
+body.light-mode .recall-item{background:rgba(0,0,0,0.03);}
+body.light-mode .recall-item:hover{background:rgba(0,0,0,0.05);}
+body.light-mode .recall-text{color:rgba(42,31,20,0.80);}
+body.light-mode .recall-check{border-color:rgba(0,0,0,0.18);}
+body.light-mode .recall-track{background:rgba(0,0,0,0.08);}
+/* Say aloud */
+body.light-mode .say-aloud{color:rgba(106,74,160,0.85);background:linear-gradient(135deg,rgba(106,74,160,0.06),rgba(106,74,160,0.02));border-color:rgba(106,74,160,0.18);}
+body.light-mode .say-aloud-label{color:var(--purple-light);}
+/* Core 5 */
+body.light-mode .core5-card{border-color:rgba(0,0,0,0.07);}
+body.light-mode .core5-card-header{background:rgba(42,138,118,0.06);}
+body.light-mode .core5-title{color:var(--cream);}
+body.light-mode .core5-def{color:rgba(42,31,20,0.72);}
+body.light-mode .core5-def strong{color:rgba(42,138,118,0.85);}
+body.light-mode .core5-example{color:var(--muted2);border-bottom-color:rgba(0,0,0,0.05);}
+body.light-mode .core5-recall{color:rgba(42,138,118,0.75);border-left-color:rgba(42,138,118,0.30);}
+body.light-mode .core5-recall-label{color:rgba(42,138,118,0.70);}
 body.light-mode .template-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);color:var(--muted2);}
 body.light-mode .template-btn:hover{border-color:rgba(201,168,76,0.38);background:var(--gold-pale);}
 body.light-mode .mantra-text{color:rgba(42,31,20,0.60);}
@@ -1266,6 +1290,12 @@ function renderAstroBox(){
   var j2000=new Date(2000,0,1,12,0,0);
   var jd=(today-j2000)/86400000;
   var moonLon=(((218.3165+13.17639645*jd)%360)+360)%360;
+  // Meeus perturbation corrections for accurate zodiac sign
+  var _Mm=(((134.9634+13.06499295*jd)%360)+360)%360;
+  var _D=(((297.8502+12.19074912*jd)%360)+360)%360;
+  var _Ms=(((357.5291+0.98560028*jd)%360)+360)%360;
+  var _r=Math.PI/180;
+  moonLon=(((moonLon+6.289*Math.sin(_Mm*_r)-1.274*Math.sin((2*_D-_Mm)*_r)+0.658*Math.sin(2*_D*_r)+0.214*Math.sin(2*_Mm*_r)-0.186*Math.sin(_Ms*_r))%360)+360)%360;
   var moonSigns=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
   var moonSign=moonSigns[Math.floor(moonLon/30)];
   var moonElMap={Aries:'fire',Taurus:'earth',Gemini:'air',Cancer:'water',Leo:'fire',Virgo:'earth',Libra:'air',Scorpio:'water',Sagittarius:'fire',Capricorn:'earth',Aquarius:'air',Pisces:'water'};
