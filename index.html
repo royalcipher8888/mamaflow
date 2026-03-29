@@ -1174,7 +1174,8 @@ function renderAstroBox(){
   document.getElementById('astro-moon-sign').textContent=phaseName;
   // Cosmic tags row
   var tagsEl=document.getElementById('astro-cosmic-tags');
-  if(tagsEl){tagsEl.innerHTML='<span class="astro-ctag">☽ Moon in '+moonSign+'</span><span class="astro-ctag">♌ '+sunSign+' Season</span><span class="astro-ctag">'+daySymbol+' '+dayRuler+' Day</span>'+(retro?'<span class="astro-ctag astro-rx">☿ Rx</span>':'');}
+  var sunSymMap={Aries:'♈',Taurus:'♉',Gemini:'♊',Cancer:'♋',Leo:'♌',Virgo:'♍',Libra:'♎',Scorpio:'♏',Sagittarius:'♐',Capricorn:'♑',Aquarius:'♒',Pisces:'♓'};
+  if(tagsEl){tagsEl.innerHTML='<span class="astro-ctag">☽ Moon in '+moonSign+'</span><span class="astro-ctag">'+sunSymMap[sunSign]+' '+sunSign+' Season</span><span class="astro-ctag">'+daySymbol+' '+dayRuler+' Day</span>'+(retro?'<span class="astro-ctag astro-rx">☿ Rx</span>':'');}
   // Energy line: "Fire Moon — [phase prefix][sign copy]"
   document.getElementById('astro-energy-line').innerHTML='<strong>'+moonElLabel+' Moon</strong> — '+(phasePrefix[phaseKey]||'')+moonSignCopy[moonSign];
   // Day pills — personalized names
