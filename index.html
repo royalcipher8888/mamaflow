@@ -212,8 +212,8 @@ body::after {
 .astro-callout{border:1px solid rgba(106,74,160,.22);border-left:3px solid var(--purple-light);border-radius:14px;padding:18px 22px;margin-bottom:20px;animation:fadeDown .8s .05s ease both;}
 .astro-callout-inner{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;}
 .astro-moon-badge{flex-shrink:0;}
-.astro-moon-sign{font-family:'Playfair Display',serif;font-size:22px;color:var(--purple-light);line-height:1;}
-.astro-moon-label{font-size:7px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.astro-moon-sign{font-family:'Playfair Display',serif;font-size:42px;font-weight:400;color:var(--purple-light);line-height:1;letter-spacing:-.01em;}
+.astro-moon-label{font-size:7px;letter-spacing:.20em;color:var(--muted);text-transform:uppercase;margin-top:4px;}
 .astro-callout-body{flex:1;min-width:180px;}
 .astro-cosmic-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .astro-ctag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--muted2);opacity:.85;}
@@ -232,8 +232,16 @@ body::after {
 .astro-pill.skill-p{background:rgba(106,74,160,.12);color:var(--purple-light);border-color:rgba(106,74,160,.2);}
 .astro-pill.rest-p{background:rgba(74,94,79,.1);color:#7aab85;border-color:rgba(74,94,79,.2);}
 .astro-pill.active-day{box-shadow:0 0 0 1.5px currentColor;filter:brightness(1.25);}
-.retro-flag{margin-top:8px;font-size:9px;color:rgba(212,128,154,.85);display:none;font-style:normal;}
+.retro-flag{margin-top:10px;font-size:9px;color:rgba(212,128,154,.85);display:none;font-style:normal;line-height:1.7;}
 .retro-flag.show{display:block;}
+.astro-natal-bar{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);font-size:8px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);text-align:center;}
+.astro-fire .astro-natal-bar{border-top-color:rgba(201,168,76,0.18);color:rgba(201,168,76,0.45);}
+.astro-earth .astro-natal-bar{border-top-color:rgba(42,138,118,0.18);color:rgba(114,196,178,0.45);}
+.astro-air .astro-natal-bar{border-top-color:rgba(42,90,138,0.18);color:rgba(112,168,216,0.45);}
+.astro-water .astro-natal-bar{border-top-color:rgba(106,74,160,0.18);color:rgba(184,160,224,0.45);}
+.theme-toggle{position:fixed;top:18px;right:18px;z-index:200;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);border-radius:20px;padding:7px 13px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--muted2);cursor:pointer;transition:all .22s;text-transform:uppercase;user-select:none;}
+.theme-toggle:hover{border-color:rgba(201,168,76,0.30);color:var(--gold-dim);}
+body.light-mode .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.14);color:var(--muted);}
 .astro-fire{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.04));border-color:rgba(201,168,76,.22);border-left-color:var(--gold);}
 .astro-fire .astro-moon-sign,.astro-fire .astro-energy-line strong{color:var(--gold);}
 .astro-fire .astro-energy-line{color:rgba(201,168,76,.75);}
@@ -524,161 +532,106 @@ body::after {
 }
 
 /* ─── LIGHT MODE ─────────────────────────────────────────────── */
-@media(prefers-color-scheme:light){
-  :root{
-    --cream:#2A1F14;
-    --ink:#F5EFE2;
-    --ink2:#EDE6D5;
-    --muted:#9A8A76;
-    --muted2:#7A6A58;
-    --gold-pale:rgba(201,168,76,0.10);
-    --gold-glow:rgba(201,168,76,0.18);
-  }
-  body{background:var(--ink);}
-  body::before{background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,0.12) 0%,transparent 62%);}
-
-  /* nav */
-  .nav-tabs{background:rgba(201,168,76,0.10);border-color:rgba(201,168,76,0.22);}
-  .nav-tab{color:var(--muted);}
-  .nav-tab:hover{color:var(--cream);background:rgba(0,0,0,0.04);}
-  .nav-tab.active{background:rgba(201,168,76,0.22);border-color:rgba(201,168,76,0.40);box-shadow:0 1px 0 rgba(201,168,76,0.4) inset,0 0 12px rgba(201,168,76,0.12);}
-
-  /* day toggle */
-  .day-toggle{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);}
-  .day-btn{color:var(--muted2);}
-  .day-btn:hover{color:var(--cream);background:rgba(0,0,0,0.05);}
-  .day-btn.active{background:linear-gradient(135deg,rgba(201,168,76,0.30),rgba(201,168,76,0.14));border-color:rgba(201,168,76,0.35);box-shadow:0 0 14px rgba(201,168,76,0.14),0 2px 4px rgba(0,0,0,0.08);}
-  .day-btn.active.skill-active{background:linear-gradient(135deg,rgba(106,74,160,0.28),rgba(106,74,160,0.12));border-color:rgba(106,74,160,0.35);box-shadow:0 0 14px rgba(106,74,160,0.14),0 2px 4px rgba(0,0,0,0.08);}
-
-  /* header */
-  .header-eyebrow{color:var(--gold-dim);}
-  .header-sub{color:var(--muted);}
-  .header-rule{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-
-  /* legend */
-  .progress-track{background:rgba(0,0,0,0.08);}
-  .progress-label{color:var(--muted);}
-
-  /* astro callout */
-  .astro-callout{border-color:rgba(106,74,160,0.20);}
-  .astro-band{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border-color:rgba(201,168,76,0.18);}
-  /* element variants on light */
-  .astro-fire{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));}
-  .astro-earth{background:linear-gradient(135deg,rgba(42,138,118,0.10),rgba(42,138,118,0.03));}
-  .astro-air{background:linear-gradient(135deg,rgba(42,90,138,0.10),rgba(42,90,138,0.03));}
-  .astro-water{background:linear-gradient(135deg,rgba(106,74,160,0.10),rgba(106,74,160,0.03));}
-
-  /* family bar */
-  .family-bar{background:linear-gradient(135deg,rgba(155,64,96,0.07),rgba(155,64,96,0.02));}
-  .family-bar.skill-bar{background:linear-gradient(135deg,rgba(106,74,160,0.07),rgba(106,74,160,0.02));}
-
-  /* blocks */
-  .theme-block.open{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07);}
-  .theme-block.open.bceo   {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(201,168,76,0.10);}
-  .theme-block.open.bvis   {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(42,90,138,0.09);}
-  .theme-block.open.bclose {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(192,112,96,0.09);}
-  .theme-block.open.bquiet {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(155,64,96,0.09);}
-  .theme-block.open.bkids  {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(42,138,118,0.09);}
-  .theme-block.open.bnight {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(154,122,48,0.09);}
-  .theme-block.open.bskill {box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(106,74,160,0.10);}
-  .theme-block.open.brestore{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(74,122,79,0.09);}
-  .theme-block.open.bcreate{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(74,122,48,0.09);}
-  .theme-block.open.bspouse{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(128,106,154,0.10);}
-
-  /* block headers — light gradient version */
-  .bceo .block-header   {background:linear-gradient(105deg,rgba(201,168,76,0.18) 0%,rgba(245,239,226,0.99) 60%);}
-  .bvis .block-header   {background:linear-gradient(105deg,rgba(42,90,138,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bclose .block-header {background:linear-gradient(105deg,rgba(192,112,96,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bquiet .block-header {background:linear-gradient(105deg,rgba(155,64,96,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bkids .block-header  {background:linear-gradient(105deg,rgba(42,138,118,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bnight .block-header {background:linear-gradient(105deg,rgba(154,122,48,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bskill .block-header {background:linear-gradient(105deg,rgba(106,74,160,0.16) 0%,rgba(245,239,226,0.99) 60%);}
-  .brestore .block-header{background:linear-gradient(105deg,rgba(74,122,79,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bcreate .block-header{background:linear-gradient(105deg,rgba(74,122,48,0.15) 0%,rgba(245,239,226,0.99) 60%);}
-  .bspouse .block-header{background:linear-gradient(105deg,rgba(128,106,154,0.16) 0%,rgba(245,239,226,0.99) 60%);}
-
-  /* block inner */
-  .bceo .block-inner,.bvis .block-inner,.bclose .block-inner,.bquiet .block-inner,
-  .bkids .block-inner,.bnight .block-inner,.bskill .block-inner,.brestore .block-inner,
-  .bcreate .block-inner,.bspouse .block-inner{background:#EDE6D5;}
-
-  /* block typography */
-  .theme-name{color:var(--cream);}
-  .theme-tag{color:var(--muted);}
-  .block-time{color:var(--muted);}
-  .block-caret{border-color:rgba(0,0,0,0.12);color:var(--muted);}
-  .theme-block.open .block-caret{border-color:rgba(201,168,76,0.28);}
-  .block-divider{background:linear-gradient(90deg,rgba(0,0,0,0.07),transparent);}
-
-  /* tasks */
-  .task{background:rgba(0,0,0,0.03);box-shadow:0 1px 0 rgba(255,255,255,0.7);}
-  .task:hover{background:rgba(0,0,0,0.055);border-color:rgba(0,0,0,0.07);box-shadow:0 2px 10px rgba(0,0,0,0.08),0 1px 0 rgba(255,255,255,0.7);}
-  .task-text{color:rgba(42,31,20,0.85);}
-  .task-check{border-color:rgba(0,0,0,0.15);}
-
-  /* notes */
-  .note-astro{background:rgba(201,168,76,0.07);border-left-color:rgba(201,168,76,0.35);color:rgba(138,111,46,0.85);}
-  .note-fam{background:rgba(42,138,118,0.07);border-left-color:rgba(42,138,118,0.35);color:rgba(42,118,100,0.80);}
-  .note-skill{background:rgba(106,74,160,0.07);border-left-color:rgba(106,74,160,0.35);color:rgba(106,74,160,0.80);}
-
-  /* week grid */
-  .day-cell{border-color:rgba(0,0,0,0.09);}
-  .day-cell:hover{border-color:rgba(0,0,0,0.18);box-shadow:0 6px 20px rgba(0,0,0,0.10);}
-  .day-cell.is-today{border-color:rgba(201,168,76,0.45);box-shadow:0 0 20px rgba(201,168,76,0.12);}
-  .day-cell-header{background:#EDE6D5;border-bottom-color:rgba(0,0,0,0.07);}
-  .day-cell.is-today .day-cell-header{background:rgba(201,168,76,0.10);}
-  .day-name{color:var(--cream);}
-  .day-date{color:var(--muted);}
-  .session-pip{color:rgba(42,31,20,0.45);background:rgba(0,0,0,0.04);}
-
-  /* week summary */
-  .session-prefs{background:linear-gradient(135deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));border-color:rgba(201,168,76,0.16);}
-  .wscard{background:linear-gradient(160deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02));border-color:rgba(0,0,0,0.08);border-top-color:rgba(201,168,76,0.22);}
-  .wscard:hover{background:rgba(0,0,0,0.055);box-shadow:0 4px 20px rgba(0,0,0,0.09);}
-  .wslabel{color:var(--muted);}
-  .week-notes-input{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.09);color:var(--cream);}
-  .week-notes-input::placeholder{color:var(--muted);}
-  .week-notes-input:focus{border-color:rgba(201,168,76,0.35);}
-  .week-notes-title{color:var(--muted);}
-  .advisory{background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));border-color:rgba(201,168,76,0.18);}
-  .astro-band{color:rgba(154,122,48,0.70);}
-
-  /* income */
-  .stream-card{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);}
-  .stream-card.vip{background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));}
-  .stream-card.digital{background:linear-gradient(135deg,rgba(106,74,160,0.07),rgba(106,74,160,0.02));}
-  .stream-card.coaching{background:linear-gradient(135deg,rgba(42,138,118,0.07),rgba(42,138,118,0.02));}
-  .stream-card.hub{background:linear-gradient(135deg,rgba(155,64,96,0.07),rgba(155,64,96,0.02));}
-  .stream-card.acuity{background:linear-gradient(135deg,rgba(42,90,138,0.07),rgba(42,90,138,0.02));}
-  .stream-card.website{background:linear-gradient(135deg,rgba(154,122,48,0.07),rgba(154,122,48,0.02));}
-  .stream-card:hover{background:rgba(0,0,0,0.055);box-shadow:0 4px 20px rgba(0,0,0,0.09);}
-  .istat{background:linear-gradient(160deg,rgba(201,168,76,0.06),rgba(201,168,76,0.01));border-color:rgba(201,168,76,0.14);border-top-color:rgba(201,168,76,0.28);}
-  .stream-name{color:var(--muted);}
-  .stream-count{color:var(--muted);}
-  .istat-label{color:var(--muted);}
-  .istat-sub{color:var(--muted);}
-  .goal-ring-bg{stroke:rgba(0,0,0,0.07);}
-
-  /* fortress */
-  .fortress-section-header{background:linear-gradient(105deg,rgba(201,168,76,0.12) 0%,rgba(245,239,226,0.99) 60%);}
-  .fortress-inner{background:#EDE6D5;}
-  .fort-divider{background:linear-gradient(90deg,rgba(0,0,0,0.07),transparent);}
-
-  /* template buttons */
-  .template-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);color:var(--muted2);}
-  .template-btn:hover{border-color:rgba(201,168,76,0.38);background:var(--gold-pale);}
-
-  /* mantra */
-  .mantra-text{color:rgba(42,31,20,0.60);}
-  .mantra-rule{background:linear-gradient(180deg,transparent,rgba(201,168,76,0.25),transparent);}
-
-  /* scrollbar (webkit) */
-  ::-webkit-scrollbar-track{background:var(--ink);}
-  ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);}
-}
+body.light-mode{--cream:#2A1F14;--ink:#F5EFE2;--ink2:#EDE6D5;--muted:#9A8A76;--muted2:#7A6A58;--gold-pale:rgba(201,168,76,0.10);--gold-glow:rgba(201,168,76,0.18);background:var(--ink);}
+body.light-mode::before{background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,0.12) 0%,transparent 62%);}
+body.light-mode .nav-tabs{background:rgba(201,168,76,0.10);border-color:rgba(201,168,76,0.22);}
+body.light-mode .nav-tab{color:var(--muted);}
+body.light-mode .nav-tab:hover{color:var(--cream);background:rgba(0,0,0,0.04);}
+body.light-mode .nav-tab.active{background:rgba(201,168,76,0.22);border-color:rgba(201,168,76,0.40);box-shadow:0 1px 0 rgba(201,168,76,0.4) inset,0 0 12px rgba(201,168,76,0.12);}
+body.light-mode .day-toggle{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);}
+body.light-mode .day-btn{color:var(--muted2);}
+body.light-mode .day-btn:hover{color:var(--cream);background:rgba(0,0,0,0.05);}
+body.light-mode .day-btn.active{background:linear-gradient(135deg,rgba(201,168,76,0.30),rgba(201,168,76,0.14));border-color:rgba(201,168,76,0.35);box-shadow:0 0 14px rgba(201,168,76,0.14),0 2px 4px rgba(0,0,0,0.08);}
+body.light-mode .day-btn.active.skill-active{background:linear-gradient(135deg,rgba(106,74,160,0.28),rgba(106,74,160,0.12));border-color:rgba(106,74,160,0.35);box-shadow:0 0 14px rgba(106,74,160,0.14),0 2px 4px rgba(0,0,0,0.08);}
+body.light-mode .header-eyebrow{color:var(--gold-dim);}
+body.light-mode .header-sub{color:var(--muted);}
+body.light-mode .header-rule{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+body.light-mode .progress-track{background:rgba(0,0,0,0.08);}
+body.light-mode .progress-label{color:var(--muted);}
+body.light-mode .astro-callout{border-color:rgba(106,74,160,0.20);}
+body.light-mode .astro-band{background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03));border-color:rgba(201,168,76,0.18);color:rgba(154,122,48,0.70);}
+body.light-mode .astro-fire{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));}
+body.light-mode .astro-earth{background:linear-gradient(135deg,rgba(42,138,118,0.10),rgba(42,138,118,0.03));}
+body.light-mode .astro-air{background:linear-gradient(135deg,rgba(42,90,138,0.10),rgba(42,90,138,0.03));}
+body.light-mode .astro-water{background:linear-gradient(135deg,rgba(106,74,160,0.10),rgba(106,74,160,0.03));}
+body.light-mode .family-bar{background:linear-gradient(135deg,rgba(155,64,96,0.07),rgba(155,64,96,0.02));}
+body.light-mode .family-bar.skill-bar{background:linear-gradient(135deg,rgba(106,74,160,0.07),rgba(106,74,160,0.02));}
+body.light-mode .theme-block.open{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07);}
+body.light-mode .theme-block.open.bceo{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(201,168,76,0.10);}
+body.light-mode .theme-block.open.bvis{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(42,90,138,0.09);}
+body.light-mode .theme-block.open.bclose{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(192,112,96,0.09);}
+body.light-mode .theme-block.open.bquiet{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(155,64,96,0.09);}
+body.light-mode .theme-block.open.bkids{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(42,138,118,0.09);}
+body.light-mode .theme-block.open.bnight{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(154,122,48,0.09);}
+body.light-mode .theme-block.open.bskill{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(106,74,160,0.10);}
+body.light-mode .theme-block.open.brestore{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(74,122,79,0.09);}
+body.light-mode .theme-block.open.bcreate{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(74,122,48,0.09);}
+body.light-mode .theme-block.open.bspouse{box-shadow:0 8px 40px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.07),0 0 32px rgba(128,106,154,0.10);}
+body.light-mode .bceo .block-header{background:linear-gradient(105deg,rgba(201,168,76,0.18) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bvis .block-header{background:linear-gradient(105deg,rgba(42,90,138,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bclose .block-header{background:linear-gradient(105deg,rgba(192,112,96,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bquiet .block-header{background:linear-gradient(105deg,rgba(155,64,96,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bkids .block-header{background:linear-gradient(105deg,rgba(42,138,118,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bnight .block-header{background:linear-gradient(105deg,rgba(154,122,48,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bskill .block-header{background:linear-gradient(105deg,rgba(106,74,160,0.16) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .brestore .block-header{background:linear-gradient(105deg,rgba(74,122,79,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bcreate .block-header{background:linear-gradient(105deg,rgba(74,122,48,0.15) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bspouse .block-header{background:linear-gradient(105deg,rgba(128,106,154,0.16) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .bceo .block-inner,body.light-mode .bvis .block-inner,body.light-mode .bclose .block-inner,body.light-mode .bquiet .block-inner,body.light-mode .bkids .block-inner,body.light-mode .bnight .block-inner,body.light-mode .bskill .block-inner,body.light-mode .brestore .block-inner,body.light-mode .bcreate .block-inner,body.light-mode .bspouse .block-inner{background:#EDE6D5;}
+body.light-mode .theme-name{color:var(--cream);}
+body.light-mode .theme-tag{color:var(--muted);}
+body.light-mode .block-time{color:var(--muted);}
+body.light-mode .block-caret{border-color:rgba(0,0,0,0.12);color:var(--muted);}
+body.light-mode .theme-block.open .block-caret{border-color:rgba(201,168,76,0.28);}
+body.light-mode .block-divider{background:linear-gradient(90deg,rgba(0,0,0,0.07),transparent);}
+body.light-mode .task{background:rgba(0,0,0,0.03);box-shadow:0 1px 0 rgba(255,255,255,0.7);}
+body.light-mode .task:hover{background:rgba(0,0,0,0.055);border-color:rgba(0,0,0,0.07);box-shadow:0 2px 10px rgba(0,0,0,0.08),0 1px 0 rgba(255,255,255,0.7);}
+body.light-mode .task-text{color:rgba(42,31,20,0.85);}
+body.light-mode .task-check{border-color:rgba(0,0,0,0.15);}
+body.light-mode .note-astro{background:rgba(201,168,76,0.07);border-left-color:rgba(201,168,76,0.35);color:rgba(138,111,46,0.85);}
+body.light-mode .note-fam{background:rgba(42,138,118,0.07);border-left-color:rgba(42,138,118,0.35);color:rgba(42,118,100,0.80);}
+body.light-mode .note-skill{background:rgba(106,74,160,0.07);border-left-color:rgba(106,74,160,0.35);color:rgba(106,74,160,0.80);}
+body.light-mode .day-cell{border-color:rgba(0,0,0,0.09);}
+body.light-mode .day-cell:hover{border-color:rgba(0,0,0,0.18);box-shadow:0 6px 20px rgba(0,0,0,0.10);}
+body.light-mode .day-cell.is-today{border-color:rgba(201,168,76,0.45);box-shadow:0 0 20px rgba(201,168,76,0.12);}
+body.light-mode .day-cell-header{background:#EDE6D5;border-bottom-color:rgba(0,0,0,0.07);}
+body.light-mode .day-cell.is-today .day-cell-header{background:rgba(201,168,76,0.10);}
+body.light-mode .day-name{color:var(--cream);}
+body.light-mode .day-date{color:var(--muted);}
+body.light-mode .session-pip{color:rgba(42,31,20,0.45);background:rgba(0,0,0,0.04);}
+body.light-mode .session-prefs{background:linear-gradient(135deg,rgba(201,168,76,0.05),rgba(201,168,76,0.01));border-color:rgba(201,168,76,0.16);}
+body.light-mode .wscard{background:linear-gradient(160deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02));border-color:rgba(0,0,0,0.08);border-top-color:rgba(201,168,76,0.22);}
+body.light-mode .wscard:hover{background:rgba(0,0,0,0.055);box-shadow:0 4px 20px rgba(0,0,0,0.09);}
+body.light-mode .wslabel{color:var(--muted);}
+body.light-mode .week-notes-input{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.09);color:var(--cream);}
+body.light-mode .week-notes-input::placeholder{color:var(--muted);}
+body.light-mode .week-notes-input:focus{border-color:rgba(201,168,76,0.35);}
+body.light-mode .advisory{background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));border-color:rgba(201,168,76,0.18);}
+body.light-mode .stream-card{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);}
+body.light-mode .stream-card.vip{background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));}
+body.light-mode .stream-card.digital{background:linear-gradient(135deg,rgba(106,74,160,0.07),rgba(106,74,160,0.02));}
+body.light-mode .stream-card.coaching{background:linear-gradient(135deg,rgba(42,138,118,0.07),rgba(42,138,118,0.02));}
+body.light-mode .stream-card.hub{background:linear-gradient(135deg,rgba(155,64,96,0.07),rgba(155,64,96,0.02));}
+body.light-mode .stream-card.acuity{background:linear-gradient(135deg,rgba(42,90,138,0.07),rgba(42,90,138,0.02));}
+body.light-mode .stream-card.website{background:linear-gradient(135deg,rgba(154,122,48,0.07),rgba(154,122,48,0.02));}
+body.light-mode .stream-card:hover{background:rgba(0,0,0,0.055);box-shadow:0 4px 20px rgba(0,0,0,0.09);}
+body.light-mode .istat{background:linear-gradient(160deg,rgba(201,168,76,0.06),rgba(201,168,76,0.01));border-color:rgba(201,168,76,0.14);border-top-color:rgba(201,168,76,0.28);}
+body.light-mode .stream-name,body.light-mode .stream-count,body.light-mode .istat-label,body.light-mode .istat-sub{color:var(--muted);}
+body.light-mode .goal-ring-bg{stroke:rgba(0,0,0,0.07);}
+body.light-mode .fortress-section-header{background:linear-gradient(105deg,rgba(201,168,76,0.12) 0%,rgba(245,239,226,0.99) 60%);}
+body.light-mode .fortress-inner{background:#EDE6D5;}
+body.light-mode .fort-divider{background:linear-gradient(90deg,rgba(0,0,0,0.07),transparent);}
+body.light-mode .template-btn{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.09);color:var(--muted2);}
+body.light-mode .template-btn:hover{border-color:rgba(201,168,76,0.38);background:var(--gold-pale);}
+body.light-mode .mantra-text{color:rgba(42,31,20,0.60);}
+body.light-mode .mantra-rule{background:linear-gradient(180deg,transparent,rgba(201,168,76,0.25),transparent);}
+body.light-mode .log-form{background:linear-gradient(135deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02));border-color:rgba(0,0,0,0.09);}
+body.light-mode .dsb-pill{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);}
+body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.03));border-color:rgba(201,168,76,0.20);}
 </style>
 </head>
 <body>
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☀ Light</button>
 <div class="container">
 
 <div class="nav-tabs">
@@ -708,18 +661,18 @@ body::after {
   <div class="astro-callout-inner">
     <div class="astro-moon-badge">
       <div class="astro-moon-sign" id="astro-moon-sign">—</div>
-      <div class="astro-moon-label">Moon Phase Today</div>
+      <div class="astro-moon-label">Moon Sign Today</div>
     </div>
     <div class="astro-callout-body">
-      <div class="astro-cosmic-tags" id="astro-cosmic-tags"></div>
       <div class="astro-energy-line" id="astro-energy-line"></div>
       <div class="astro-day-suggest">
-        <span class="astro-suggest-label">Best day type →</span>
+        <span class="astro-suggest-label">Best Day Type →</span>
         <div class="astro-day-pills" id="astro-day-pills"></div>
       </div>
-      <div class="retro-flag" id="retro-flag">☿ Mercury Retrograde — proof, don't pitch. Confirm, don't launch.</div>
+      <div class="retro-flag" id="retro-flag">℧ Mercury Retrograde — double-check messages, back up work, delay major launches if possible.</div>
     </div>
   </div>
+  <div class="astro-natal-bar">— Leo Sun · Libra Rising · Sag Moon —</div>
 </div>
 <div class="day-toggle">
   <button class="day-btn active" onclick="setDay('push',this)">🔥 Push Day</button>
@@ -1145,87 +1098,48 @@ function renderHistory(){var currentKey=getMonthKey(viewingMonth);var keys=Objec
 function toggleHistory(){var toggle=document.getElementById('history-toggle');var body=document.getElementById('history-body');toggle.classList.toggle('open');body.classList.toggle('open');}
 function renderAstroBox(){
   var today=new Date();
-  // ── Moon phase (synodic, anchored to known new moon Jan 6 2000) ──
-  var anchor=new Date(2000,0,6);
-  var daysSince=(today-anchor)/86400000;
-  var pos=((daysSince%29.53059)+29.53059)%29.53059;
-  var phaseKey,phaseEmoji,phaseName;
-  if(pos<1.85){phaseKey='new';phaseEmoji='🌑';phaseName='New Moon';}
-  else if(pos<7.38){phaseKey='waxing-crescent';phaseEmoji='🌒';phaseName='Waxing Crescent';}
-  else if(pos<11.08){phaseKey='first-quarter';phaseEmoji='🌓';phaseName='First Quarter';}
-  else if(pos<14.77){phaseKey='waxing-gibbous';phaseEmoji='🌔';phaseName='Waxing Gibbous';}
-  else if(pos<16.61){phaseKey='full';phaseEmoji='🌕';phaseName='Full Moon';}
-  else if(pos<22.15){phaseKey='waning-gibbous';phaseEmoji='🌖';phaseName='Waning Gibbous';}
-  else if(pos<25.84){phaseKey='last-quarter';phaseEmoji='🌗';phaseName='Last Quarter';}
-  else{phaseKey='waning-crescent';phaseEmoji='🌘';phaseName='Waning Crescent';}
-  // ── Moon sign (mean lunar longitude from J2000.0) ──
+  // Moon sign (mean lunar longitude from J2000.0)
   var j2000=new Date(2000,0,1,12,0,0);
   var jd=(today-j2000)/86400000;
   var moonLon=(((218.3165+13.17639645*jd)%360)+360)%360;
   var moonSigns=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
   var moonSign=moonSigns[Math.floor(moonLon/30)];
-  // ── Solar season (Sun sign by date) ──
-  var m=today.getMonth()+1,d=today.getDate();
-  var sunSign,elementKey;
-  if((m===3&&d>=20)||(m===4&&d<=19)){sunSign='Aries';elementKey='fire';}
-  else if((m===4&&d>=20)||(m===5&&d<=20)){sunSign='Taurus';elementKey='earth';}
-  else if((m===5&&d>=21)||(m===6&&d<=20)){sunSign='Gemini';elementKey='air';}
-  else if((m===6&&d>=21)||(m===7&&d<=22)){sunSign='Cancer';elementKey='water';}
-  else if((m===7&&d>=23)||(m===8&&d<=22)){sunSign='Leo';elementKey='fire';}
-  else if((m===8&&d>=23)||(m===9&&d<=22)){sunSign='Virgo';elementKey='earth';}
-  else if((m===9&&d>=23)||(m===10&&d<=22)){sunSign='Libra';elementKey='air';}
-  else if((m===10&&d>=23)||(m===11&&d<=21)){sunSign='Scorpio';elementKey='water';}
-  else if((m===11&&d>=22)||(m===12&&d<=21)){sunSign='Sagittarius';elementKey='fire';}
-  else if((m===12&&d>=22)||(m===1&&d<=19)){sunSign='Capricorn';elementKey='earth';}
-  else if((m===1&&d>=20)||(m===2&&d<=18)){sunSign='Aquarius';elementKey='air';}
-  else{sunSign='Pisces';elementKey='water';}
-  // ── Planetary day ruler ──
-  var planetNames=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
-  var planetSymbols=['☀','☽','♂','☿','♃','♀','♄'];
-  var dayRuler=planetNames[today.getDay()];
-  var daySymbol=planetSymbols[today.getDay()];
-  // ── Mercury Retrograde ──
+  // Moon element
+  var moonElMap={Aries:'fire',Taurus:'earth',Gemini:'air',Cancer:'water',Leo:'fire',Virgo:'earth',Libra:'air',Scorpio:'water',Sagittarius:'fire',Capricorn:'earth',Aquarius:'air',Pisces:'water'};
+  var moonEl=moonElMap[moonSign]||'fire';
+  var moonElLabel=moonEl.charAt(0).toUpperCase()+moonEl.slice(1);
+  // Element descriptions (Kay: Leo Sun · Libra Rising · Sag Moon)
+  var elCopy={
+    fire:'Bold and energized — lead with confidence, outreach, and revenue moves. Leo Sun is fully activated.',
+    earth:'Grounded and productive — refine your systems, deliver quality work, build and price with confidence.',
+    air:'Collaborative and communicative — networking, outreach, and visibility. Libra Rising is lit up.',
+    water:'Intuitive and feeling — create from the heart, protect your energy, trust the deeper knowing.'
+  };
+  // Mercury retrograde
   var retro=false;
   var rw=[[new Date(2026,2,15),new Date(2026,3,7)],[new Date(2026,6,10),new Date(2026,7,2)],[new Date(2026,9,31),new Date(2026,10,20)]];
   rw.forEach(function(w){if(today>=w[0]&&today<=w[1])retro=true;});
-  // ── Phase prefix ──
-  var phasePrefix={'new':'New slate —','waxing-crescent':'Building —','first-quarter':'Decision point —','waxing-gibbous':'Refining —','full':'Full power.','waning-gibbous':'Integrating —','last-quarter':'Clearing —','waning-crescent':'Preparing —'};
-  // ── Moon sign copy (Kay: Leo Sun · Libra Rising · Sag Moon) ──
-  var moonSignCopy={
-    Aries:'Sag Moon loves a spark. Start the thing you\'ve been circling. Bold outreach, revenue conversations, first moves.',
-    Taurus:'Leo Sun needs visible quality. Polish your offer. Set your price and hold it. Build something you\'re proud to show.',
-    Gemini:'Leo voice wants an audience. High communication day — DMs, content, live, outreach. Sag Moon thrives in the exchange.',
-    Cancer:'Protective and intuitive. Family rhythm first, then CEO work in the quiet pockets. Toddler energy is the priority right now.',
-    Leo:'Moon in your Sun sign. This is your peak confidence window. Post bold, pitch confidently, be fully seen today.',
-    Virgo:'Refinement and craft mode. VIP deliverables, CyberSecure Hub depth, detail work. Leo Sun rewards quality.',
-    Libra:'Moon conjunct your Rising. Aesthetics and client relationships are lit up. VIP proposals, beauty work, visual content.',
-    Scorpio:'Deep focus and high intuition. Security research, lab work, TryHackMe. Sag Moon researches without distraction right now.',
-    Sagittarius:'Moon in your natal sign. Freedom and expansion energy. Teach, coach, create big-picture content. This is your flow state.',
-    Capricorn:'Ambition and structure. CEO pipeline review, revenue strategy, pricing confidence. Climb with a plan.',
-    Aquarius:'Innovation and community. CyberSecure Hub vision, collective teaching, tech creativity and future-building.',
-    Pisces:'Fluid and creative. Design, visual assets, intuitive content. Let the work be beautiful and trust the flow.'
-  };
-  // ── Day type recommendation by moon sign ──
+  // Day type recommendation by moon sign
   var moonDayMap={Aries:'push',Taurus:'create',Gemini:'create',Cancer:'rest',Leo:'push',Virgo:'skill',Libra:'create',Scorpio:'skill',Sagittarius:'push',Capricorn:'push',Aquarius:'skill',Pisces:'create'};
   var recommendedDay=moonDayMap[moonSign]||'push';
-  var copy=(phasePrefix[phaseKey]||'')+(moonSignCopy[moonSign]||'');
   var el=document.getElementById('daily-astro-box');
   if(!el)return;
-  document.getElementById('astro-moon-sign').textContent=phaseEmoji+' '+phaseName;
-  // Cosmic tags row
-  var tagsEl=document.getElementById('astro-cosmic-tags');
-  if(tagsEl)tagsEl.innerHTML='<span class="astro-ctag">☽ Moon in '+moonSign+'</span><span class="astro-ctag">♌ '+sunSign+' Season</span><span class="astro-ctag">'+daySymbol+' '+dayRuler+' Day</span>'+(retro?'<span class="astro-ctag" style="color:rgba(212,128,154,.9);border-color:rgba(212,128,154,.3)">☿ Rx</span>':'');
-  document.getElementById('astro-energy-line').innerHTML='<strong>Moon in '+moonSign+'</strong> — '+copy;
+  // Large moon sign name
+  document.getElementById('astro-moon-sign').textContent=moonSign;
+  // Energy line: "Fire Moon — description"
+  document.getElementById('astro-energy-line').innerHTML='<strong>'+moonElLabel+' Moon</strong> — <em>'+elCopy[moonEl]+'</em>';
+  // Day pills with renamed labels matching the screenshot
   var pillMap={push:'push-p',create:'create-p',skill:'skill-p',rest:'rest-p'};
-  var pillEmoji={push:'🔥',create:'✨',skill:'🛡',rest:'🌿'};
-  var pillLabel={push:'Push Day',create:'Create Day',skill:'Skill Day',rest:'Rest Day'};
+  var pillEmoji={push:'🔥',create:'✦',skill:'♡',rest:'🌿'};
+  var pillLabel={push:'Revenue Day',create:'Build Day',skill:'Growth Day',rest:'Rest Day'};
   document.getElementById('astro-day-pills').innerHTML=['push','create','skill','rest'].map(function(t){
     var active=(t===recommendedDay)?' active-day':'';
     return '<div class="astro-pill '+pillMap[t]+active+'" onclick="setDayFromAstro(\''+t+'\')">'+pillEmoji[t]+' '+pillLabel[t]+'</div>';
   }).join('');
   var flag=document.getElementById('retro-flag');
   if(flag){if(retro)flag.classList.add('show');else flag.classList.remove('show');}
-  el.className='astro-callout astro-'+elementKey;
+  // Box theming uses moon element (not solar season)
+  el.className='astro-callout astro-'+moonEl;
   el.style.display='';
 }
 function setDayFromAstro(type){
@@ -1238,6 +1152,8 @@ function setDayFromAstro(type){
   document.querySelectorAll('#astro-day-pills .astro-pill').forEach(function(p){if(p.getAttribute('onclick')&&p.getAttribute('onclick').indexOf("'"+type+"'")!==-1)p.classList.add('active-day');});
   renderBlocks();try{saveState();showSaved();}catch(e){}
 }
+function toggleTheme(){var isLight=document.body.classList.toggle('light-mode');localStorage.setItem('kenyatta_theme',isLight?'light':'dark');var btn=document.getElementById('theme-toggle');if(btn)btn.innerHTML=isLight?'🌙 Dark':'☀ Light';}
+(function(){var saved=localStorage.getItem('kenyatta_theme');var sysLight=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches;if(saved==='light'||(saved!=='dark'&&sysLight)){document.body.classList.add('light-mode');var btn=document.getElementById('theme-toggle');if(btn)btn.innerHTML='🌙 Dark';}})();
 try{loadState();}catch(e){}
 renderBlocks();
 // Harden day button sync after renderBlocks runs
