@@ -304,6 +304,47 @@ body.light-mode .theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,
 .pip-skill{border-left:2px solid rgba(106,74,160,.5)!important;}
 .week-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:22px;animation:fadeDown .8s .16s ease both;}
 .wscard{background:linear-gradient(160deg,rgba(255,255,255,0.04),rgba(14,11,7,0.6));border:1px solid rgba(255,255,255,.06);border-top:2px solid rgba(201,168,76,0.20);border-radius:12px;padding:18px 14px;text-align:center;transition:all .2s;}
+/* ── History Calendar ── */
+.week-hist-cal{background:linear-gradient(160deg,rgba(255,255,255,0.03),rgba(14,11,7,0.5));border:1px solid rgba(255,255,255,0.06);border-top:2px solid rgba(201,168,76,0.18);border-radius:14px;padding:20px;margin-bottom:18px;}
+.whc-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.whc-month{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);}
+.whc-arrow{background:none;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:var(--muted2);font-size:15px;padding:3px 10px;cursor:pointer;transition:border-color .2s,color .2s;}
+.whc-arrow:hover{border-color:rgba(201,168,76,0.30);color:var(--gold-dim);}
+.whc-dow-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.whc-dow-row span{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-align:center;color:var(--muted);text-transform:uppercase;}
+.whc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.whc-day{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);cursor:default;position:relative;}
+.whc-day.today{background:rgba(201,168,76,0.10);border:1px solid rgba(201,168,76,0.35);color:var(--gold);}
+.whc-day.future{color:rgba(255,255,255,0.12);}
+.whc-day.has-hist{cursor:pointer;color:var(--cream);}
+.whc-day.has-hist:hover{transform:scale(1.09);z-index:2;}
+.whc-day.push-hist{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.22);}
+.whc-day.create-hist{background:rgba(147,112,219,0.12);border:1px solid rgba(147,112,219,0.22);}
+.whc-day.skill-hist{background:rgba(42,138,118,0.12);border:1px solid rgba(42,138,118,0.22);}
+.whc-day.rest-hist{background:rgba(42,90,138,0.12);border:1px solid rgba(42,90,138,0.22);}
+.whc-dot{width:4px;height:4px;border-radius:50%;margin-top:2px;}
+.push-hist .whc-dot{background:var(--gold-dim);}
+.create-hist .whc-dot{background:rgba(147,112,219,0.7);}
+.skill-hist .whc-dot{background:rgba(114,196,178,0.7);}
+.rest-hist .whc-dot{background:rgba(112,168,216,0.7);}
+/* History modal */
+.hist-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:300;backdrop-filter:blur(5px);}
+.hist-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:301;width:min(480px,92vw);max-height:80vh;overflow-y:auto;background:linear-gradient(160deg,rgba(30,24,18,0.98),rgba(14,11,7,0.99));border:1px solid rgba(201,168,76,0.20);border-top:2px solid rgba(201,168,76,0.40);border-radius:18px;padding:28px;}
+.hist-overlay.open,.hist-modal.open{display:block;}
+.hist-modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;}
+.hist-modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--cream);line-height:1.3;}
+.hist-close{background:none;border:1px solid rgba(255,255,255,0.10);border-radius:8px;color:var(--muted2);font-size:16px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hist-close:hover{border-color:rgba(201,168,76,0.30);color:var(--gold-dim);}
+.hist-pct-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-bottom:6px;overflow:hidden;}
+.hist-pct-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+.hist-pct-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--muted);text-align:right;margin-bottom:20px;}
+.hist-block{margin-bottom:18px;}
+.hist-block-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.hist-task{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:var(--muted2);line-height:1.4;}
+.hist-task.done{color:var(--cream);}
+.hist-check{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;margin-top:1px;}
+.hist-task.done .hist-check{background:rgba(201,168,76,0.20);border-color:rgba(201,168,76,0.40);color:var(--gold);}
+.hist-empty{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--muted);text-align:center;padding:32px 0;}
 .wscard:hover{background:rgba(255,255,255,.050);box-shadow:0 4px 20px rgba(0,0,0,0.30);transform:translateY(-1px);}
 .wsnum{font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1;}
 .wsnum.cp{color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.25);}
@@ -701,6 +742,15 @@ body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76
 <!-- ══ WEEKLY VIEW ══ -->
 <div class="view active" id="view-weekly">
 <div class="week-header"><h2>Weekly <em>Rhythm</em></h2><p>Set your intention · plan the week · flow into each day</p></div>
+<div class="week-hist-cal" id="week-hist-cal">
+  <div class="whc-nav">
+    <button class="whc-arrow" onclick="wcalShift(-1)">‹</button>
+    <span class="whc-month" id="whc-month-label"></span>
+    <button class="whc-arrow" onclick="wcalShift(1)">›</button>
+  </div>
+  <div class="whc-dow-row"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+  <div class="whc-grid" id="whc-grid"></div>
+</div>
 <div class="week-intention-box">
   <div class="week-intention-label">This Week's Intention</div>
   <textarea class="week-notes-input" id="week-notes" placeholder="Revenue goal · VIP bookings · skill module · content theme · $5K milestone..."></textarea>
@@ -1053,7 +1103,7 @@ function selectType(type,el){selectedType=type;document.querySelectorAll('.dtype
 function updateSessionPrefs(){var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');sessionPrefs.morning=cbs[0].checked;sessionPrefs.afternoon=cbs[1].checked;sessionPrefs.night=cbs[2].checked;var count=[sessionPrefs.morning,sessionPrefs.afternoon,sessionPrefs.night].filter(Boolean).length;document.getElementById('session-badge').textContent=count+' session'+(count!==1?'s':'')+' active';updateDaySessionBar();renderBlocks();renderWeekGrid();try{saveState();}catch(e){}}
 function applyTemplate(tpl){var t={balanced:['push','create','push','skill','push','create','rest'],heavy:['push','push','create','push','skill','push','rest'],creative:['create','push','create','skill','create','rest','rest'],skillweek:['push','skill','create','skill','push','rest','skill'],contentweek:['push','push','create','push','push','rest','rest'],clear:[null,null,null,null,null,null,null]};weekPlan=t[tpl].slice();renderWeekGrid();try{saveState();}catch(e){}}
 function assignDay(i){weekPlan[i]=(weekPlan[i]===selectedType)?null:selectedType;renderWeekGrid();try{saveState();showSaved();}catch(e){}}
-function renderWeekGrid(){var grid=document.getElementById('week-grid');if(!grid)return;var today=new Date();var todayDow=(today.getDay()+6)%7;var monday=new Date(today);monday.setDate(today.getDate()-todayDow);grid.innerHTML='';DAYS.forEach(function(day,i){var cellDate=new Date(monday);cellDate.setDate(monday.getDate()+i);var isToday=(i===todayDow);var type=weekPlan[i];var typeLabel=type?type.charAt(0).toUpperCase()+type.slice(1)+' Day':'Tap to set';var typeCls=type?'t-'+type:'t-empty';var dateStr=(cellDate.getMonth()+1)+'/'+cellDate.getDate();var pipsHtml='';if(type){var notes=SESSION_NOTES[type];var isSkill=type==='skill';if(sessionPrefs.morning)pipsHtml+='<div class="session-pip pip-morning'+(isSkill?' pip-skill':'')+'">'+notes.morning+'</div>';if(sessionPrefs.afternoon)pipsHtml+='<div class="session-pip pip-afternoon'+(isSkill?' pip-skill':'')+'">'+notes.afternoon+'</div>';if(sessionPrefs.night)pipsHtml+='<div class="session-pip pip-night'+(isSkill?' pip-skill':'')+'">'+notes.night+'</div>';}var cell=document.createElement('div');cell.className='day-cell'+(isToday?' is-today':'');cell.onclick=(function(idx){return function(){assignDay(idx);};})(i);cell.innerHTML='<div class="day-cell-header"><div class="day-name">'+day+'</div><div class="day-date">'+dateStr+(isToday?' · today':'')+'</div></div><div class="day-cell-body"><div class="dct '+typeCls+'">'+typeLabel+'</div>'+(pipsHtml?'<div class="day-sessions">'+pipsHtml+'</div>':'')+'</div>';grid.appendChild(cell);});updateWeekSummary();}
+function renderWeekGrid(){renderWCal();var grid=document.getElementById('week-grid');if(!grid)return;var today=new Date();var todayDow=(today.getDay()+6)%7;var monday=new Date(today);monday.setDate(today.getDate()-todayDow);grid.innerHTML='';DAYS.forEach(function(day,i){var cellDate=new Date(monday);cellDate.setDate(monday.getDate()+i);var isToday=(i===todayDow);var type=weekPlan[i];var typeLabel=type?type.charAt(0).toUpperCase()+type.slice(1)+' Day':'Tap to set';var typeCls=type?'t-'+type:'t-empty';var dateStr=(cellDate.getMonth()+1)+'/'+cellDate.getDate();var pipsHtml='';if(type){var notes=SESSION_NOTES[type];var isSkill=type==='skill';if(sessionPrefs.morning)pipsHtml+='<div class="session-pip pip-morning'+(isSkill?' pip-skill':'')+'">'+notes.morning+'</div>';if(sessionPrefs.afternoon)pipsHtml+='<div class="session-pip pip-afternoon'+(isSkill?' pip-skill':'')+'">'+notes.afternoon+'</div>';if(sessionPrefs.night)pipsHtml+='<div class="session-pip pip-night'+(isSkill?' pip-skill':'')+'">'+notes.night+'</div>';}var cell=document.createElement('div');cell.className='day-cell'+(isToday?' is-today':'');cell.onclick=(function(idx){return function(){assignDay(idx);};})(i);cell.innerHTML='<div class="day-cell-header"><div class="day-name">'+day+'</div><div class="day-date">'+dateStr+(isToday?' · today':'')+'</div></div><div class="day-cell-body"><div class="dct '+typeCls+'">'+typeLabel+'</div>'+(pipsHtml?'<div class="day-sessions">'+pipsHtml+'</div>':'')+'</div>';grid.appendChild(cell);});updateWeekSummary();}
 function updateWeekSummary(){var counts={push:0,create:0,skill:0,rest:0};weekPlan.forEach(function(t){if(t)counts[t]++;});document.getElementById('sum-push').textContent=counts.push;document.getElementById('sum-create').textContent=counts.create;document.getElementById('sum-skill').textContent=counts.skill;document.getElementById('sum-rest').textContent=counts.rest;var si=document.getElementById('skill-insight');if(counts.skill>=1){var skillDays=[];weekPlan.forEach(function(t,i){if(t==='skill')skillDays.push(DAYS[i]);});si.innerHTML='&#128737; <strong>Skill days this week: '+skillDays.join(', ')+'.</strong> What you learn on skill days becomes content, course material, and coaching depth.';si.classList.remove('hidden');}else{si.classList.add('hidden');}var advisory=document.getElementById('week-advisory');var msg='';if(counts.push>=4&&counts.rest===0){msg='&#9888; <strong>Sag Moon alert:</strong> No rest days planned. Add at least one rest day.';}else if(counts.rest>=3){msg='&#9836; <strong>Leo Sun check:</strong> Three or more rest days is a lot for your energy type.';}else if(counts.skill===0&&counts.push>=3){msg='&#128737; <strong>Skill gap:</strong> No Skill Day planned this week. Even one skill day keeps the edge sharp.';}else if(counts.push>=2&&counts.skill>=1&&counts.rest>=1){msg='&#10024; <strong>Astro-aligned week:</strong> Push days for revenue, skill day for authority, rest day to keep Sag Moon\u2019s fire burning.';}else if(counts.push===0){msg='&#9836; <strong>Leo Sun needs movement:</strong> No push days means no revenue conversations this week.';}else if(counts.skill>=3){msg='&#128737; <strong>Skill-heavy week:</strong> Make sure push days are still covering revenue conversations.';}advisory.innerHTML=msg;advisory.style.display=msg?'block':'none';}
 var recallChecked={};
 function toggleFs(id){var el=document.getElementById('fs-'+id);if(el)el.classList.toggle('open');}
@@ -1066,7 +1116,65 @@ var WEEKLY_RESET_KEY='kenyatta_last_week';
 function getMondayStr(){var today=new Date();var dow=(today.getDay()+6)%7;var mon=new Date(today);mon.setDate(today.getDate()-dow);return mon.getFullYear()+'-'+(mon.getMonth()+1)+'-'+mon.getDate();}
 function getTodayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function saveState(){try{var weekNote=document.getElementById('week-notes');var state={currentDay:currentDay,checked:checked,recallChecked:recallChecked,weekPlan:weekPlan,sessionPrefs:sessionPrefs,weekNote:weekNote?weekNote.value:'',savedDate:getTodayStr(),savedWeek:getMondayStr()};localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}}
-function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;var state=JSON.parse(raw);var todayStr=getTodayStr();var thisWeek=getMondayStr();if(state.savedDate!==todayStr){checked={};recallChecked={};}else{checked=state.checked||{};recallChecked=state.recallChecked||{};}if(state.savedWeek!==thisWeek){weekPlan=['push','create','push','skill','push','create','rest'];}else{weekPlan=state.weekPlan||weekPlan;}currentDay=state.currentDay||'push';sessionPrefs=state.sessionPrefs||sessionPrefs;document.querySelectorAll('.day-btn').forEach(function(b){b.classList.remove('active','skill-active');});var dayBtns=document.querySelectorAll('.day-btn');var dayMap={push:0,create:1,skill:2,rest:3};if(dayMap[currentDay]!==undefined&&dayBtns[dayMap[currentDay]]){dayBtns[dayMap[currentDay]].classList.add('active');if(currentDay==='skill')dayBtns[dayMap[currentDay]].classList.add('skill-active');}var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');if(cbs[0])cbs[0].checked=sessionPrefs.morning!==false;if(cbs[1])cbs[1].checked=sessionPrefs.afternoon!==false;if(cbs[2])cbs[2].checked=sessionPrefs.night!==false;if(state.weekNote){var wn=document.getElementById('week-notes');if(wn)wn.value=state.weekNote;}}catch(e){}}
+var HIST_KEY='kenyatta_history_v1';
+function snapshotToday(dateStr){
+  if(!dateStr)return;
+  var hist=JSON.parse(localStorage.getItem(HIST_KEY)||'{}');
+  var type=currentDay||'push';
+  var blocks=(D[type]&&D[type].blocks)?D[type].blocks:[];
+  var total=0,done=0;
+  blocks.forEach(function(blk,bi){(blk.tasks||[]).forEach(function(t,ti){total++;if(checked[type+'-'+blk.id+'-'+ti])done++;});});
+  hist[dateStr]={type:type,done:done,total:total,checked:JSON.parse(JSON.stringify(checked))};
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
+}
+var wcalOffset=0;
+function renderWCal(){
+  var today=new Date();
+  var vy=today.getFullYear(),vm=today.getMonth()+wcalOffset;
+  while(vm>11){vm-=12;vy++;}while(vm<0){vm+=12;vy--;}
+  var hist=JSON.parse(localStorage.getItem(HIST_KEY)||'{}');
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl=document.getElementById('whc-month-label');if(lbl)lbl.textContent=months[vm]+' '+vy;
+  var firstDow=new Date(vy,vm,1).getDay();
+  var daysInMonth=new Date(vy,vm+1,0).getDate();
+  var todayStr=getTodayStr();
+  var todayDate=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  var html='';
+  for(var i=0;i<firstDow;i++)html+='<div class="whc-day"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var ds=vy+'-'+(vm+1)+'-'+d;
+    var cellDate=new Date(vy,vm,d);
+    var isToday=(ds===todayStr);
+    var isPast=cellDate<todayDate;
+    var entry=hist[ds];
+    if(isToday){html+='<div class="whc-day today"><span>'+d+'</span></div>';}
+    else if(entry&&isPast){var pct=entry.total>0?Math.round(entry.done/entry.total*100):0;html+='<div class="whc-day has-hist '+entry.type+'-hist" onclick="openHistModal(\''+ds+'\')" title="'+entry.type+' · '+pct+'% done"><span>'+d+'</span><div class="whc-dot"></div></div>';}
+    else if(isPast){html+='<div class="whc-day past"><span style="opacity:.25">'+d+'</span></div>';}
+    else{html+='<div class="whc-day future"><span>'+d+'</span></div>';}
+  }
+  var g=document.getElementById('whc-grid');if(g)g.innerHTML=html;
+}
+function wcalShift(dir){wcalOffset+=dir;renderWCal();}
+function openHistModal(ds){
+  var hist=JSON.parse(localStorage.getItem(HIST_KEY)||'{}');
+  var entry=hist[ds];if(!entry)return;
+  var parts=ds.split('-');
+  var mnths=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var dateLabel=mnths[parseInt(parts[1])-1]+' '+parts[2]+', '+parts[0];
+  var typeLbl={push:'🔥 Push Day',create:'✨ Create Day',skill:'🛡 Skill Day',rest:'🌿 Rest Day'};
+  document.getElementById('hist-modal-title').innerHTML=dateLabel+'<br><span style="font-family:\'DM Mono\',monospace;font-size:9px;letter-spacing:.14em;color:var(--muted2)">'+typeLbl[entry.type]+'</span>';
+  var pct=entry.total>0?Math.round(entry.done/entry.total*100):0;
+  var blocks=(D[entry.type]&&D[entry.type].blocks)?D[entry.type].blocks:[];
+  var body='<div class="hist-pct-bar"><div class="hist-pct-fill" style="width:'+pct+'%"></div></div>';
+  body+='<div class="hist-pct-label">'+entry.done+' / '+entry.total+' tasks · '+pct+'% complete</div>';
+  if(blocks.length===0){body+='<div class="hist-empty">No task data saved for this day.</div>';}
+  else{blocks.forEach(function(blk,bi){if(!blk.tasks||blk.tasks.length===0)return;body+='<div class="hist-block"><div class="hist-block-title">'+(blk.wl||blk.label||'Block '+(bi+1))+'</div>';blk.tasks.forEach(function(task,ti){var done=entry.checked&&entry.checked[entry.type+'-'+blk.id+'-'+ti];body+='<div class="hist-task'+(done?' done':'')+'"><div class="hist-check">'+(done?'✓':'')+'</div><span>'+task+'</span></div>';});body+='</div>';});}
+  document.getElementById('hist-modal-body').innerHTML=body;
+  document.getElementById('hist-overlay').classList.add('open');
+  document.getElementById('hist-modal').classList.add('open');
+}
+function closeHistModal(){document.getElementById('hist-overlay').classList.remove('open');document.getElementById('hist-modal').classList.remove('open');}
+function loadState(){try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;var state=JSON.parse(raw);var todayStr=getTodayStr();var thisWeek=getMondayStr();if(state.savedDate!==todayStr){snapshotToday(state.savedDate);checked={};recallChecked={};}else{checked=state.checked||{};recallChecked=state.recallChecked||{};}if(state.savedWeek!==thisWeek){weekPlan=['push','create','push','skill','push','create','rest'];}else{weekPlan=state.weekPlan||weekPlan;}currentDay=state.currentDay||'push';sessionPrefs=state.sessionPrefs||sessionPrefs;document.querySelectorAll('.day-btn').forEach(function(b){b.classList.remove('active','skill-active');});var dayBtns=document.querySelectorAll('.day-btn');var dayMap={push:0,create:1,skill:2,rest:3};if(dayMap[currentDay]!==undefined&&dayBtns[dayMap[currentDay]]){dayBtns[dayMap[currentDay]].classList.add('active');if(currentDay==='skill')dayBtns[dayMap[currentDay]].classList.add('skill-active');}var cbs=document.querySelectorAll('.session-prefs input[type=checkbox]');if(cbs[0])cbs[0].checked=sessionPrefs.morning!==false;if(cbs[1])cbs[1].checked=sessionPrefs.afternoon!==false;if(cbs[2])cbs[2].checked=sessionPrefs.night!==false;if(state.weekNote){var wn=document.getElementById('week-notes');if(wn)wn.value=state.weekNote;}}catch(e){}}
 function restoreRecallUI(){Object.keys(recallChecked).forEach(function(key){if(!recallChecked[key])return;var item=document.querySelector('[data-recall-key="'+key+'"]');if(item){item.classList.add('done');var chk=item.querySelector('.recall-check');if(chk)chk.innerHTML='&#10003;';}});updateRecallProgress();}
 var wnEl=document.getElementById('week-notes');if(wnEl)wnEl.addEventListener('input',saveState);
 var INCOME_KEY='kenyatta_income_v1';
@@ -1225,6 +1333,14 @@ try{renderDayShape();}catch(e){}
 function showSaved(){var el=document.getElementById('save-indicator');if(!el)return;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';},1200);}
 loadIncome();
 </script>
+<div class="hist-overlay" id="hist-overlay" onclick="closeHistModal()"></div>
+<div class="hist-modal" id="hist-modal">
+  <div class="hist-modal-hdr">
+    <div class="hist-modal-title" id="hist-modal-title"></div>
+    <button class="hist-close" onclick="closeHistModal()">×</button>
+  </div>
+  <div class="hist-modal-body" id="hist-modal-body"></div>
+</div>
 <div id="save-indicator" style="position:fixed;bottom:20px;right:20px;z-index:999;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:1px;padding:6px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,168,76,0.7);opacity:0;transition:opacity .4s ease;pointer-events:none;">✦ saved</div>
 </body>
 </html>
