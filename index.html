@@ -704,7 +704,7 @@ body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76
   <div class="astro-callout-inner">
     <div class="astro-moon-badge">
       <div class="astro-moon-sign" id="astro-moon-sign">—</div>
-      <div class="astro-moon-label">Moon Phase Today</div>
+      <div class="astro-moon-label" id="astro-moon-label">Moon Sign Today</div>
     </div>
     <div class="astro-callout-body">
       <div class="astro-cosmic-tags" id="astro-cosmic-tags"></div>
@@ -1280,7 +1280,8 @@ function renderAstroBox(){
   var el=document.getElementById('daily-astro-box');
   if(!el)return;
   // Moon sign hero — shows phase name (large display)
-  document.getElementById('astro-moon-sign').textContent=phaseName;
+  document.getElementById('astro-moon-sign').textContent=moonSign;
+  var lbl=document.getElementById('astro-moon-label');if(lbl)lbl.textContent=phaseEmoji+' '+phaseName;
   // Cosmic tags row
   var tagsEl=document.getElementById('astro-cosmic-tags');
   var sunSymMap={Aries:'♈',Taurus:'♉',Gemini:'♊',Cancer:'♋',Leo:'♌',Virgo:'♍',Libra:'♎',Scorpio:'♏',Sagittarius:'♐',Capricorn:'♑',Aquarius:'♒',Pisces:'♓'};
