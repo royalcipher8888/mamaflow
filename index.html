@@ -1103,7 +1103,7 @@ function toggleBlock(id){document.getElementById('blk-'+id).classList.toggle('op
 function toggleTask(key,el){checked[key]=!checked[key];el.classList.toggle('done');el.querySelector('.task-check').innerHTML=checked[key]?'&#10003;':'';updateProgress();try{saveState();showSaved();}catch(e){}}
 function updateProgress(){var data=D[currentDay],total=0,done=0;data.blocks.forEach(function(block){block.tasks.forEach(function(t,ti){total++;if(checked[currentDay+'-'+block.id+'-'+ti])done++;});});var pct=total?Math.round(done/total*100):0;document.getElementById('progress-text').textContent=done+' / '+total+' complete';document.getElementById('progress-fill').style.width=pct+'%';}
 function resetDay(){D[currentDay].blocks.forEach(function(block){block.tasks.forEach(function(t,ti){checked[currentDay+'-'+block.id+'-'+ti]=false;});});renderBlocks();try{saveState();}catch(e){}}
-function switchView(view,btn){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+view).classList.add('active');btn.classList.add('active');if(view==='weekly')renderWeekGrid();if(view==='income')renderIncome();if(view==='daily')renderWCal();}
+function switchView(view,btn){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});document.querySelectorAll('.nav-tab').forEach(function(b){b.classList.remove('active');});document.getElementById('view-'+view).classList.add('active');btn.classList.add('active');if(view==='weekly')renderWeekGrid();if(view==='income')renderIncome();if(view==='daily'){renderWCal();try{renderAstroBox();}catch(e){};}}
 var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SESSION_NOTES={push:{morning:'CEO + VIP outreach',afternoon:'Deliver + close',night:'Deep work + skill bonus'},create:{morning:'CEO + content batch',afternoon:'Design + build',night:'Edit + repurpose'},skill:{morning:'Soft CEO + lab setup',afternoon:'Deep lab / home build',night:'Skill → content bridge'},rest:{morning:'Soft CEO (30 min)',afternoon:'Family + receive mode',night:'Optional only'}};
 var weekPlan=['push','create','push','skill','push','create','rest'];
@@ -1342,7 +1342,7 @@ try{
     if(!data)return;
     _fbPause=true;
     localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-    try{loadState();renderBlocks();renderWCal();updateDaySessionBar();}catch(e){}
+    try{loadState();renderBlocks();renderWCal();updateDaySessionBar();renderAstroBox();}catch(e){}
     _fbPause=false;
   }
   function _applyIncome(data){
