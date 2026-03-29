@@ -221,6 +221,7 @@ body::after {
 .astro-earth .astro-ctag{background:rgba(42,138,118,0.10);border-color:rgba(42,138,118,0.20);color:rgba(114,196,178,.8);}
 .astro-air .astro-ctag{background:rgba(42,90,138,0.10);border-color:rgba(42,90,138,0.20);color:rgba(112,168,216,.8);}
 .astro-water .astro-ctag{background:rgba(106,74,160,0.10);border-color:rgba(106,74,160,0.20);color:rgba(184,160,224,.8);}
+.astro-rx{background:rgba(212,128,154,0.12)!important;border-color:rgba(212,128,154,0.28)!important;color:rgba(212,128,154,0.9)!important;}
 .astro-energy-line{font-size:11px;color:rgba(184,160,224,.75);line-height:1.7;margin-bottom:8px;font-style:italic;}
 .astro-energy-line strong{color:var(--purple-light);font-style:normal;}
 .astro-day-suggest{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -661,9 +662,10 @@ body.light-mode .day-shape-bar{background:linear-gradient(135deg,rgba(201,168,76
   <div class="astro-callout-inner">
     <div class="astro-moon-badge">
       <div class="astro-moon-sign" id="astro-moon-sign">—</div>
-      <div class="astro-moon-label">Moon Sign Today</div>
+      <div class="astro-moon-label">Moon Phase Today</div>
     </div>
     <div class="astro-callout-body">
+      <div class="astro-cosmic-tags" id="astro-cosmic-tags"></div>
       <div class="astro-energy-line" id="astro-energy-line"></div>
       <div class="astro-day-suggest">
         <span class="astro-suggest-label">Best Day Type →</span>
@@ -1098,48 +1100,95 @@ function renderHistory(){var currentKey=getMonthKey(viewingMonth);var keys=Objec
 function toggleHistory(){var toggle=document.getElementById('history-toggle');var body=document.getElementById('history-body');toggle.classList.toggle('open');body.classList.toggle('open');}
 function renderAstroBox(){
   var today=new Date();
-  // Moon sign (mean lunar longitude from J2000.0)
+  // ── Moon sign (mean lunar longitude J2000.0) ──
   var j2000=new Date(2000,0,1,12,0,0);
   var jd=(today-j2000)/86400000;
   var moonLon=(((218.3165+13.17639645*jd)%360)+360)%360;
   var moonSigns=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
   var moonSign=moonSigns[Math.floor(moonLon/30)];
-  // Moon element
   var moonElMap={Aries:'fire',Taurus:'earth',Gemini:'air',Cancer:'water',Leo:'fire',Virgo:'earth',Libra:'air',Scorpio:'water',Sagittarius:'fire',Capricorn:'earth',Aquarius:'air',Pisces:'water'};
   var moonEl=moonElMap[moonSign]||'fire';
   var moonElLabel=moonEl.charAt(0).toUpperCase()+moonEl.slice(1);
-  // Element descriptions (Kay: Leo Sun · Libra Rising · Sag Moon)
-  var elCopy={
-    fire:'Bold and energized — lead with confidence, outreach, and revenue moves. Leo Sun is fully activated.',
-    earth:'Grounded and productive — refine your systems, deliver quality work, build and price with confidence.',
-    air:'Collaborative and communicative — networking, outreach, and visibility. Libra Rising is lit up.',
-    water:'Intuitive and feeling — create from the heart, protect your energy, trust the deeper knowing.'
-  };
-  // Mercury retrograde
+  // ── Moon phase (synodic cycle, anchor Jan 6 2000) ──
+  var anchor=new Date(2000,0,6);
+  var daysSince=(today-anchor)/86400000;
+  var pos=((daysSince%29.53059)+29.53059)%29.53059;
+  var phaseKey,phaseName;
+  if(pos<1.85){phaseKey='new';phaseName='New Moon';}
+  else if(pos<7.38){phaseKey='waxcrescent';phaseName='Waxing Crescent';}
+  else if(pos<9.22){phaseKey='firstquarter';phaseName='First Quarter';}
+  else if(pos<14.77){phaseKey='waxgibbous';phaseName='Waxing Gibbous';}
+  else if(pos<16.61){phaseKey='full';phaseName='Full Moon';}
+  else if(pos<22.15){phaseKey='wangibbous';phaseName='Waning Gibbous';}
+  else if(pos<23.99){phaseKey='lastquarter';phaseName='Last Quarter';}
+  else{phaseKey='wancrescent';phaseName='Waning Crescent';}
+  // ── Solar season (sun sign → element for box theming) ──
+  var m=today.getMonth()+1,d=today.getDate();
+  var sunSign,elementKey;
+  if((m===3&&d>=21)||(m===4&&d<=19))sunSign='Aries';
+  else if((m===4&&d>=20)||(m===5&&d<=20))sunSign='Taurus';
+  else if((m===5&&d>=21)||(m===6&&d<=20))sunSign='Gemini';
+  else if((m===6&&d>=21)||(m===7&&d<=22))sunSign='Cancer';
+  else if((m===7&&d>=23)||(m===8&&d<=22))sunSign='Leo';
+  else if((m===8&&d>=23)||(m===9&&d<=22))sunSign='Virgo';
+  else if((m===9&&d>=23)||(m===10&&d<=22))sunSign='Libra';
+  else if((m===10&&d>=23)||(m===11&&d<=21))sunSign='Scorpio';
+  else if((m===11&&d>=22)||(m===12&&d<=21))sunSign='Sagittarius';
+  else if((m===12&&d>=22)||(m===1&&d<=19))sunSign='Capricorn';
+  else if((m===1&&d>=20)||(m===2&&d<=18))sunSign='Aquarius';
+  else sunSign='Pisces';
+  var sunElMap={Aries:'fire',Taurus:'earth',Gemini:'air',Cancer:'water',Leo:'fire',Virgo:'earth',Libra:'air',Scorpio:'water',Sagittarius:'fire',Capricorn:'earth',Aquarius:'air',Pisces:'water'};
+  elementKey=sunElMap[sunSign]||'fire';
+  // ── Planetary day ruler ──
+  var planetNames=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+  var planetSymbols=['☀','☽','♂','☿','♃','♀','♄'];
+  var dayRuler=planetNames[today.getDay()];
+  var daySymbol=planetSymbols[today.getDay()];
+  // ── Mercury retrograde ──
   var retro=false;
   var rw=[[new Date(2026,2,15),new Date(2026,3,7)],[new Date(2026,6,10),new Date(2026,7,2)],[new Date(2026,9,31),new Date(2026,10,20)]];
   rw.forEach(function(w){if(today>=w[0]&&today<=w[1])retro=true;});
-  // Day type recommendation by moon sign
+  // ── Phase prefix ──
+  var phasePrefix={new:'Seeds are planted — ',waxcrescent:'Intentions are forming — ',firstquarter:'Take decisive action — ',waxgibbous:'Refinement and momentum — ',full:'Peak clarity and visibility — ',wangibbous:'Gratitude and integration — ',lastquarter:'Release and pivot — ',wancrescent:'Rest and surrender — '};
+  // ── Moon sign copy (Kay-specific) ──
+  var moonSignCopy={
+    Aries:'ignite bold moves. Pitch, outreach, and start what you\'ve been delaying.',
+    Taurus:'ground into your value. Refine offers, anchor pricing, build slowly and well.',
+    Gemini:'communicate and connect. Content, DMs, conversations — visibility is your currency.',
+    Cancer:'protect and nurture. Check in with family, rest your nervous system, create from love.',
+    Leo:'own the room. Show up fully, lead with confidence, let your work be seen.',
+    Virgo:'refine your craft. Audit systems, improve your process, execute with care.',
+    Libra:'attract and collaborate. Partnerships, aesthetics, client experience — beauty opens doors.',
+    Scorpio:'go deep. Strategy, research, shadow work, and deals made in quiet rooms.',
+    Sagittarius:'expand your vision. Learn, teach, travel light, and trust the bigger picture.',
+    Capricorn:'build the structure. Long-term plans, discipline, and the work that compounds.',
+    Aquarius:'innovate and disrupt. Community, tech, unconventional moves — your edge is your weirdness.',
+    Pisces:'dream and receive. Intuition is data. Rest, create, and let inspiration lead.'
+  };
+  // ── Day type recommendation by moon sign ──
   var moonDayMap={Aries:'push',Taurus:'create',Gemini:'create',Cancer:'rest',Leo:'push',Virgo:'skill',Libra:'create',Scorpio:'skill',Sagittarius:'push',Capricorn:'push',Aquarius:'skill',Pisces:'create'};
   var recommendedDay=moonDayMap[moonSign]||'push';
   var el=document.getElementById('daily-astro-box');
   if(!el)return;
-  // Large moon sign name
-  document.getElementById('astro-moon-sign').textContent=moonSign;
-  // Energy line: "Fire Moon — description"
-  document.getElementById('astro-energy-line').innerHTML='<strong>'+moonElLabel+' Moon</strong> — <em>'+elCopy[moonEl]+'</em>';
-  // Day pills with renamed labels matching the screenshot
+  // Moon sign hero — shows phase name (large display)
+  document.getElementById('astro-moon-sign').textContent=phaseName;
+  // Cosmic tags row
+  var tagsEl=document.getElementById('astro-cosmic-tags');
+  if(tagsEl){tagsEl.innerHTML='<span class="astro-ctag">☽ Moon in '+moonSign+'</span><span class="astro-ctag">♌ '+sunSign+' Season</span><span class="astro-ctag">'+daySymbol+' '+dayRuler+' Day</span>'+(retro?'<span class="astro-ctag astro-rx">☿ Rx</span>':'');}
+  // Energy line: "Fire Moon — [phase prefix][sign copy]"
+  document.getElementById('astro-energy-line').innerHTML='<strong>'+moonElLabel+' Moon</strong> — '+(phasePrefix[phaseKey]||'')+moonSignCopy[moonSign];
+  // Day pills — personalized names
   var pillMap={push:'push-p',create:'create-p',skill:'skill-p',rest:'rest-p'};
-  var pillEmoji={push:'🔥',create:'✦',skill:'♡',rest:'🌿'};
-  var pillLabel={push:'Revenue Day',create:'Build Day',skill:'Growth Day',rest:'Rest Day'};
+  var pillEmoji={push:'🔥',create:'✨',skill:'🛡',rest:'🌿'};
+  var pillLabel={push:'Push Day',create:'Create Day',skill:'Skill Day',rest:'Rest Day'};
   document.getElementById('astro-day-pills').innerHTML=['push','create','skill','rest'].map(function(t){
     var active=(t===recommendedDay)?' active-day':'';
     return '<div class="astro-pill '+pillMap[t]+active+'" onclick="setDayFromAstro(\''+t+'\')">'+pillEmoji[t]+' '+pillLabel[t]+'</div>';
   }).join('');
   var flag=document.getElementById('retro-flag');
   if(flag){if(retro)flag.classList.add('show');else flag.classList.remove('show');}
-  // Box theming uses moon element (not solar season)
-  el.className='astro-callout astro-'+moonEl;
+  // Box element class = solar season element
+  el.className='astro-callout astro-'+elementKey;
   el.style.display='';
 }
 function setDayFromAstro(type){
