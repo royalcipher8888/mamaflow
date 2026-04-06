@@ -1250,6 +1250,44 @@ body::after {
 .core5-card, .snapshot-card { border-radius:8px; }
 .scount-badge { border-radius:4px; }
 .progress-wrap, .cmd-progress { border-radius:6px; }
+
+/* ── Astro Popup ── */
+.cmd-topbar-right { position:relative; }
+.astro-popup {
+  position:absolute; top:calc(100% + 8px); right:0;
+  width:300px; z-index:999;
+  background:rgba(13,11,26,0.72);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:12px; padding:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(155,111,232,0.08);
+}
+.ap-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+.ap-header > span { font-size:28px; line-height:1; flex-shrink:0; }
+.ap-header > div { flex:1; }
+.ap-close { background:none; border:none; color:var(--ink3); font-size:18px; cursor:pointer; padding:0 0 0 8px; line-height:1; }
+.ap-close:hover { color:var(--ink); }
+.ap-phase { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--purple-light); font-family:'DM Mono',monospace; }
+.ap-sign { font-size:14px; color:var(--ink); font-family:'Instrument Serif',serif; margin-top:3px; }
+.ap-illumination { font-size:10px; color:var(--ink3); letter-spacing:.08em; margin-bottom:10px; }
+.ap-divider { height:1px; background:var(--border); margin:10px 0; }
+.ap-element { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); margin-bottom:6px; }
+.ap-trait { font-size:12px; color:var(--ink2); line-height:1.55; margin-bottom:8px; }
+.ap-phase-energy { font-size:11px; color:var(--ink2); line-height:1.55; font-style:italic; margin-bottom:10px; }
+.ap-personal { font-size:11px; color:var(--purple-light); line-height:1.5; border-top:1px solid var(--border); padding-top:10px; }
+
+/* ── Header typography contrast ── */
+.week-header h2,
+.fortress-header h2 { display:flex; align-items:baseline; gap:9px; }
+.week-header h2 .h2-label,
+.fortress-header h2 .h2-label {
+  font-size:11px; font-weight:700; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--ink3);
+  font-family:'DM Mono',monospace; align-self:center;
+}
+.week-header h2 em,
+.fortress-header h2 em { font-size:32px; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -1283,6 +1321,22 @@ body::after {
       <div class="cmd-topbar-right">
         <div class="cmd-energy" id="cmd-energy"></div>
         <div class="cmd-pill" id="cmd-pill"></div>
+        <div id="astro-popup" class="astro-popup" style="display:none;" onclick="event.stopPropagation()">
+          <div class="ap-header">
+            <span id="ap-icon"></span>
+            <div>
+              <div class="ap-phase" id="ap-phase"></div>
+              <div class="ap-sign" id="ap-sign"></div>
+            </div>
+            <button class="ap-close" onclick="closeAstroPopup()">×</button>
+          </div>
+          <div class="ap-illumination" id="ap-illumination"></div>
+          <div class="ap-divider"></div>
+          <div class="ap-element" id="ap-element"></div>
+          <div class="ap-trait" id="ap-trait"></div>
+          <div class="ap-phase-energy" id="ap-phase-energy"></div>
+          <div class="ap-personal" id="ap-personal"></div>
+        </div>
       </div>
     </div>
 
@@ -1363,7 +1417,7 @@ body::after {
   <div class="view" id="view-weekly">
 
     <div class="week-header">
-      <h2>Weekly <em>Rhythm</em></h2>
+      <h2><span class="h2-label">Weekly</span> <em>Rhythm</em></h2>
       <p>Select a type · tap a day · build your week</p>
     </div>
 
@@ -1441,7 +1495,7 @@ body::after {
   <div class="view" id="view-fortress">
 
     <div class="fortress-header">
-      <h2>The <em>Fortress</em></h2>
+      <h2><span class="h2-label">The</span> <em>Fortress</em></h2>
       <p>Manifesto · Identity · Knowledge Recall</p>
     </div>
 
@@ -2281,15 +2335,14 @@ function syncDailyFromWeekPlan(){
     pillEl.textContent=detectedType.charAt(0).toUpperCase()+detectedType.slice(1)+' Day';
   }
 
-  // Update energy note
-  var energyMap={
-    push:'<span>♌</span> Leo season — protect the morning. Power moves before noon.',
-    create:'<span>✨</span> Deep work day — no meetings, no DMs until 1PM.',
-    skill:'<span>🛡</span> CyberSecure focus — one module, one insight, one step forward.',
-    rest:'<span>🌿</span> Rest day. You cannot pour from empty.'
-  };
+  // Update energy note — live astro data
+  var moon=getMoonData(new Date());
   var energyEl=document.getElementById('cmd-energy');
-  if(energyEl) energyEl.innerHTML=energyMap[detectedType]||energyMap.push;
+  if(energyEl){
+    energyEl.innerHTML=moon.icon+' <strong>'+moon.sign.name+' Moon</strong> · '+moon.sign.energy;
+    energyEl.style.cursor='pointer';
+    energyEl.onclick=openAstroPopup;
+  }
 
   // Update priority
   var priorityMap={
@@ -2633,6 +2686,34 @@ function renderAstroCard() {
     '<div class="astro-personal"><strong style="color:var(--purple-light);font-style:normal;">Leo Sun · Libra Rising</strong> — ' + leoNote + '</div>';
 }
 
+
+function openAstroPopup() {
+  var popup = document.getElementById('astro-popup');
+  if (!popup) return;
+  var moon = getMoonData(new Date());
+  var sign = moon.sign;
+  document.getElementById('ap-icon').textContent = moon.icon;
+  document.getElementById('ap-phase').textContent = moon.phase;
+  document.getElementById('ap-sign').textContent = sign.symbol + ' ' + sign.name + ' Moon';
+  document.getElementById('ap-illumination').textContent = moon.illumination + '% illuminated';
+  document.getElementById('ap-element').textContent = sign.element + ' sign';
+  document.getElementById('ap-trait').textContent = sign.trait;
+  document.getElementById('ap-phase-energy').textContent = moon.phaseEnergy;
+  var leoNote = sign.name === 'Sagittarius' ? 'Moon in your natal sign — trust the expansive feeling.'
+    : sign.element === 'Fire'  ? 'Fire moon amplifies your Leo Sun. High creative energy.'
+    : sign.element === 'Earth' ? 'Earth moon grounds your Leo fire. Execute, don\'t just envision.'
+    : sign.element === 'Air'   ? 'Air moon lightens Leo\'s intensity. Connection comes easily.'
+    :                            'Water moon softens Leo\'s drive. Lead with intuition today.';
+  document.getElementById('ap-personal').innerHTML = '<strong>Leo Sun · Libra Rising</strong> — ' + leoNote;
+  popup.style.display = 'block';
+  setTimeout(function(){ document.addEventListener('click', _astroPopupOutside); }, 0);
+}
+function closeAstroPopup() {
+  var p = document.getElementById('astro-popup');
+  if (p) p.style.display = 'none';
+  document.removeEventListener('click', _astroPopupOutside);
+}
+function _astroPopupOutside() { closeAstroPopup(); }
 
 function initCommandView() {
   // Populate date
