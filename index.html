@@ -55,6 +55,38 @@
 }
 
 
+/* ── Light mode variable overrides ── */
+body.light-mode {
+  --bg:#F0EEFF;
+  --surface:#FFFFFF;
+  --surface2:#E8E2FF;
+  --border:rgba(0,0,0,0.09);
+  --border2:rgba(0,0,0,0.16);
+  --ink:#17122E;
+  --ink2:#4A4668;
+  --ink3:#8B87A8;
+  --purple:#7B52D3;
+  --purple-light:#6B3FC8;
+  --purple-dim:rgba(123,82,211,0.10);
+  --purple-glow:rgba(123,82,211,0.15);
+  --blue:#3A6FD8;
+  --blue-light:#2553B8;
+  --blue-dim:rgba(58,111,216,0.10);
+  --mint:#1A9E7E;
+  --mint-light:#0F7A60;
+  --mint-dim:rgba(26,158,126,0.10);
+  --amber:#C88A0A;
+  --amber-light:#A06800;
+  --amber-dim:rgba(200,138,10,0.10);
+  --rose:#D03060;
+  --rose-light:#A01840;
+  --rose-dim:rgba(208,48,96,0.10);
+  --green:#2A7040;
+  --green-light:#1A5030;
+  --muted:var(--ink3);
+  --muted2:var(--ink2);
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 
@@ -1298,6 +1330,42 @@ body::after {
   font-family:'Instrument Serif',serif; font-style:italic; font-weight:400;
   color:var(--ink2); font-size:32px; letter-spacing:-.01em;
 }
+
+/* ── Theme toggle button ── */
+.theme-toggle {
+  background:none; border:1px solid var(--border2); cursor:pointer;
+  padding:5px 9px; border-radius:8px; font-size:14px; line-height:1;
+  transition:background .2s, border-color .2s; flex-shrink:0;
+}
+.theme-toggle:hover { background:var(--surface2); border-color:var(--purple); }
+
+/* ── Light mode surface overrides ── */
+body.light-mode .cmd-date {
+  background:linear-gradient(90deg,#7B52D3,#3A6FD8,#1A9E7E);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+body.light-mode .stream-card,
+body.light-mode .cmd-revenue-card,
+body.light-mode .cmd-priority-card,
+body.light-mode .cmd-astro-card,
+body.light-mode .cmd-block,
+body.light-mode .fortress-section,
+body.light-mode .log-form,
+body.light-mode .session-prefs,
+body.light-mode .advisory,
+body.light-mode .family-bar { background:var(--surface); }
+body.light-mode .astro-band,
+body.light-mode .wscard,
+body.light-mode .skill-insight { background:var(--surface2); }
+body.light-mode .week-notes-input { background:var(--surface); color:var(--ink); }
+body.light-mode .nav-tab.active { color:var(--purple); }
+body.light-mode .day-cell { background:var(--surface); }
+body.light-mode .day-cell.is-today { border-color:var(--purple); }
+body.light-mode .log-select,
+body.light-mode .log-input { background:var(--surface); color:var(--ink); border-color:var(--border2); }
+body.light-mode .astro-popup { background:rgba(255,255,255,0.85); }
+body.light-mode .theme-toggle { color:var(--ink); }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -1311,6 +1379,9 @@ body::after {
       <div class="brand-mark">Reign <em>OS</em></div>
     </div>
     <div class="topbar-sub">Leo Sun · Libra Rising · Sag Moon · Mama · Builder</div>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <span id="theme-icon">☀️</span>
+    </button>
   </div>
 
   <div class="nav-tabs">
@@ -2485,8 +2556,37 @@ function updateRecallProgress() {
 // ══════════════════════════════════════════
 //  LOCALSTORAGE PERSISTENCE
 // ══════════════════════════════════════════
-var NOTION_URL = '#'; // Set your Notion page URL here
+var NOTION_URL = 'https://notion.so'; // Update to your specific Notion page URL
 var STORAGE_KEY = 'kenyatta_dailyflow_v4';
+
+// ── Theme (light / dark) ──────────────────
+(function() {
+  var saved = localStorage.getItem('mamaflow_theme');
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var useDark = saved ? (saved === 'dark') : prefersDark;
+  if (!useDark) document.body.classList.add('light-mode');
+  var icon = document.getElementById('theme-icon');
+  if (icon) icon.textContent = useDark ? '☀️' : '🌙';
+})();
+
+function toggleTheme() {
+  var isLight = document.body.classList.toggle('light-mode');
+  var isDark = !isLight;
+  localStorage.setItem('mamaflow_theme', isDark ? 'dark' : 'light');
+  var icon = document.getElementById('theme-icon');
+  if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+}
+
+// Listen to system preference changes (auto-update if no manual override)
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (!localStorage.getItem('mamaflow_theme')) {
+      document.body.classList.toggle('light-mode', !e.matches);
+      var icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = e.matches ? '☀️' : '🌙';
+    }
+  });
+}
 var DAILY_RESET_KEY = 'kenyatta_last_reset';
 var WEEKLY_RESET_KEY = 'kenyatta_last_week';
 
