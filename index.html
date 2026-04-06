@@ -537,15 +537,15 @@ body::after {
 .day-cell {
   overflow:hidden; cursor:pointer; transition:all .22s;
   border:1px solid var(--border); background:var(--surface);
-  display:flex; flex-direction:column; min-height:130px;
+  display:flex; flex-direction:column; min-height:160px;
 }
 .day-cell:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:2px 4px 0 rgba(0,0,0,.3); }
 .day-cell.is-today { border-color:var(--purple); }
 .day-cell.is-today::before { content:''; display:block; height:2px; background:linear-gradient(90deg,var(--purple),var(--blue)); }
 
 .day-cell-header { padding:8px 8px 5px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; }
-.day-name { font-family:'Instrument Serif',serif; font-size:13px; color:var(--ink); font-weight:400; }
-.day-date { font-size:9px; color:var(--ink3); }
+.day-name { font-family:'Instrument Serif',serif; font-size:16px; color:var(--ink); font-weight:400; }
+.day-date { font-size:11px; color:var(--ink2); }
 .day-cell.is-today .day-name { color:var(--purple); }
 
 .day-cell-body { flex:1; padding:7px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:4px; }
@@ -628,7 +628,7 @@ body::after {
 /* ══ FORTRESS ══ */
 .fortress-header { margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid var(--border); animation:fadeDown .8s ease both; display:flex; align-items:baseline; justify-content:space-between; }
 .fortress-header h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--ink); line-height:1; letter-spacing:-.02em; }
-.fortress-header h2 em { font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; color:var(--purple); letter-spacing:-.01em; }
+.fortress-header h2 em { font-family:'Instrument Serif',serif; font-style:italic; font-weight:400; color:var(--blue-light); letter-spacing:-.01em; }
 .fortress-header p { font-size:10px; letter-spacing:.2em; color:var(--ink3); text-transform:uppercase; }
 
 .purpose-bar {
@@ -933,7 +933,10 @@ body::after {
   flex-wrap:wrap; gap:8px;
 }
 .cmd-date {
-  font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3);
+  font-size:15px; letter-spacing:.16em; text-transform:uppercase;
+  background:linear-gradient(90deg, var(--purple-light), var(--blue-light), var(--mint-light));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; font-weight:700;
 }
 .cmd-topbar-right { display:flex; align-items:center; gap:10px; }
 .cmd-energy {
@@ -1279,15 +1282,22 @@ body::after {
 
 /* ── Header typography contrast ── */
 .week-header h2,
-.fortress-header h2 { display:flex; align-items:baseline; gap:9px; }
+.fortress-header h2,
+.income-header h2 { display:flex; align-items:baseline; gap:9px; }
 .week-header h2 .h2-label,
-.fortress-header h2 .h2-label {
+.fortress-header h2 .h2-label,
+.income-header h2 .h2-label {
   font-size:11px; font-weight:700; letter-spacing:.22em;
-  text-transform:uppercase; color:var(--ink3);
+  text-transform:uppercase; color:var(--ink);
   font-family:'DM Mono',monospace; align-self:center;
 }
 .week-header h2 em,
-.fortress-header h2 em { font-size:32px; }
+.fortress-header h2 em,
+.income-header h2 em { font-size:32px; }
+.income-header h2 .h2-trailer {
+  font-family:'Instrument Serif',serif; font-style:italic; font-weight:400;
+  color:var(--ink2); font-size:32px; letter-spacing:-.01em;
+}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -1421,6 +1431,9 @@ body::after {
       <p>Select a type · tap a day · build your week</p>
     </div>
 
+    <div class="week-notes-title">Week Intention</div>
+    <textarea class="week-notes-input" id="week-notes" placeholder="Revenue goal, VIP bookings, skill module to complete, content theme, $5K milestone..."></textarea>
+
     <div class="astro-band">
       <strong>♌ You have 3 real work windows every day:</strong> Morning CEO block, afternoon family handoff, night session after bedtime. Most mamas get one window. You have three — plus a Skill Day type for lab and training work. <strong>2–3 skill nights per week in night sessions, plus one full Skill Day, is your sweet spot.</strong>
     </div>
@@ -1485,8 +1498,6 @@ body::after {
       <div class="wscard"><div class="wsnum cr" id="sum-rest">0</div><div class="wslabel">Rest Days</div></div>
     </div>
 
-    <div class="week-notes-title">Week Intention</div>
-    <textarea class="week-notes-input" id="week-notes" placeholder="Revenue goal, VIP bookings, skill module to complete, content theme, $5K milestone..."></textarea>
     <div class="advisory" id="week-advisory"></div>
 
   </div>
@@ -1871,7 +1882,7 @@ body::after {
   <div class="view" id="view-income">
 
     <div class="income-header">
-      <h2>The <em>$5K</em> Tracker</h2>
+      <h2><span class="h2-label">The</span> <em>$5K</em> <span class="h2-trailer">Tracker</span></h2>
       <p>VIP Design Days · Digital Products · Monthly Progress</p>
     </div>
 
